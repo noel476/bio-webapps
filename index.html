@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>生物基礎 インタラクティブ教材</title>
+<meta name="description" content="高校生物基礎のオンデマンド授業で使える、ブラウザだけで動く小さな教材集">
+<style>
+/* 共通スタイル(ビルド時に各HTMLへインライン展開される) */
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-2: #eaf0ec;
+  --text: #17211d;
+  --muted: #455650;
+  --border: #b9c5be;
+  --accent: #00695c;
+  --accent-text: #ffffff;
+  --accent-soft: #d7ede8;
+  --focus: #0050c8;
+  --ok: #0b6b2f;
+  --ok-bg: #dff3e4;
+  --ng: #a3281d;
+  --ng-bg: #fbe4e0;
+  --note-bg: #fff4d6;
+  --note-border: #8a6200;
+  /* データ用色(Okabe-Ito 系・色覚多様性に配慮。必ず形/線種/文字も併用する) */
+  --c1: #0072b2;
+  --c2: #c04a00;
+  --c3: #a8508c;
+  --c4: #007a5a;
+  --cell-fill: #e3f1e8;
+  --cell-stroke: #2f5d44;
+  --nuc-fill: #d6e6f5;
+  --chromo: #7a2e8a;
+  --grid: #c9d3cd;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #1a2320;
+    --surface-2: #243029;
+    --text: #e9f0ec;
+    --muted: #b0bfb8;
+    --border: #46544d;
+    --accent: #5cc4b0;
+    --accent-text: #06211c;
+    --accent-soft: #1f3a34;
+    --focus: #8cb8ff;
+    --ok: #7fdc9a;
+    --ok-bg: #173a24;
+    --ng: #ff9d90;
+    --ng-bg: #4a1f1a;
+    --note-bg: #3a3012;
+    --note-border: #e0b84a;
+    --c1: #5db8f0;
+    --c2: #f0a060;
+    --c3: #e0a0d0;
+    --c4: #4fd6a8;
+    --cell-fill: #24382d;
+    --cell-stroke: #8fc9a8;
+    --nuc-fill: #263a52;
+    --chromo: #d9a0e8;
+    --grid: #3a4842;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #1a2320;
+  --surface-2: #243029;
+  --text: #e9f0ec;
+  --muted: #b0bfb8;
+  --border: #46544d;
+  --accent: #5cc4b0;
+  --accent-text: #06211c;
+  --accent-soft: #1f3a34;
+  --focus: #8cb8ff;
+  --ok: #7fdc9a;
+  --ok-bg: #173a24;
+  --ng: #ff9d90;
+  --ng-bg: #4a1f1a;
+  --note-bg: #3a3012;
+  --note-border: #e0b84a;
+  --c1: #5db8f0;
+  --c2: #f0a060;
+  --c3: #e0a0d0;
+  --c4: #4fd6a8;
+  --cell-fill: #24382d;
+  --cell-stroke: #8fc9a8;
+  --nuc-fill: #263a52;
+  --chromo: #d9a0e8;
+  --grid: #3a4842;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  line-height: 1.7;
+  font-size: 16px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
+.app-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.app-header .back { font-size: 0.9rem; white-space: nowrap; }
+.app-header h1 { font-size: 1.25rem; margin: 0; flex: 1 1 220px; line-height: 1.4; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lead { color: var(--muted); margin: 16px 0; }
+.lead b { color: var(--text); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin: 14px 0; box-shadow: var(--shadow);
+}
+.panel > h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.panel > h3 { font-size: 1rem; margin: 12px 0 4px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 780px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.btn {
+  font: inherit; min-height: 44px; min-width: 44px; padding: 6px 16px; border-radius: 10px;
+  border: 2px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.btn:hover { background: var(--accent-soft); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg label {
+  min-height: 44px; display: inline-flex; align-items: center; padding: 4px 14px; cursor: pointer;
+  border: 2px solid var(--border); border-radius: 10px; background: var(--surface); gap: 6px;
+}
+.seg input:checked + label { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.seg input:checked + label::before { content: "✓"; }
+.seg input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.ctl { margin: 10px 0; }
+.ctl > label, .ctl > .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: 0.95rem; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--accent); }
+.ctl input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); margin: 2px 0; }
+.ctl .hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+.note {
+  background: var(--note-bg); border-left: 6px solid var(--note-border); border-radius: 6px;
+  padding: 8px 12px; margin: 12px 0; font-size: 0.9rem;
+}
+.note::before { content: "※ 注意:"; font-weight: 700; margin-right: 4px; }
+.note.info::before { content: "ℹ 補足:"; }
+.badge {
+  display: inline-block; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--accent);
+  background: var(--accent-soft); font-weight: 700; font-size: 0.9rem;
+}
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0; }
+.readout > div { background: var(--surface-2); border-radius: 8px; padding: 6px 10px; }
+.readout .k { font-size: 0.78rem; color: var(--muted); display: block; }
+.readout .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+svg.fig, canvas.fig { width: 100%; height: auto; display: block; max-width: 100%; }
+svg text { font-family: inherit; fill: var(--text); }
+svg .axis { stroke: var(--text); stroke-width: 1.5; fill: none; }
+svg .grid { stroke: var(--grid); stroke-width: 1; }
+svg .muted-t { fill: var(--muted); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.tbl th, table.tbl td { border: 1px solid var(--border); padding: 4px 8px; text-align: center; }
+table.tbl th { background: var(--surface-2); }
+.scroll-x { overflow-x: auto; }
+
+/* クイズ */
+.quiz .q-head { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+.quiz .q-text { font-weight: 700; font-size: 1.05rem; margin: 6px 0 10px; }
+.quiz .choices { display: grid; gap: 8px; }
+.quiz .choice {
+  font: inherit; text-align: left; min-height: 48px; padding: 8px 12px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.quiz .choice:hover:not([disabled]) { border-color: var(--accent); background: var(--accent-soft); }
+.quiz .choice .mark { min-width: 1.6em; font-weight: 700; }
+.quiz .choice.correct { border-color: var(--ok); background: var(--ok-bg); }
+.quiz .choice.wrong { border-color: var(--ng); background: var(--ng-bg); }
+.quiz .choice[disabled] { cursor: default; color: var(--text); opacity: 1; }
+.quiz .feedback { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+.quiz .feedback .verdict { font-weight: 700; }
+.quiz .feedback.ok .verdict { color: var(--ok); }
+.quiz .feedback.ng .verdict { color: var(--ng); }
+.quiz .result-score { font-size: 1.4rem; font-weight: 700; }
+.quiz ul.miss { padding-left: 1.2em; }
+
+/* 一覧ページ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.card {
+  display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px; box-shadow: var(--shadow);
+}
+.card:hover { border-color: var(--accent); }
+.card h2 { margin: 0; font-size: 1.1rem; }
+.card .icon { font-size: 2rem; line-height: 1; }
+.card .tag { font-size: 0.82rem; color: var(--muted); }
+.card .go { margin-top: auto; font-weight: 700; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+
+</style>
+</head>
+<body>
+<header class="app-header">
+<h1>生物基礎 インタラクティブ教材</h1>
+<button id="theme-toggle" class="btn" type="button" aria-label="表示テーマの切り替え">表示切替</button>
+</header>
+<main class="wrap">
+<p class="lead"><b>ブラウザだけで動く小さな教材集です。</b>スライダーやボタンを動かして、しくみを目で確かめられます。各教材の最後に4択の確認クイズがあります。インストールやログインは不要で、入力内容の保存や外部への送信は行いません。</p>
+<div class="cards">
+<a class="card" href="mitosis.html">
+<span class="icon" aria-hidden="true">🔬</span>
+<h2>体細胞分裂のステップ送り</h2>
+<span>間期から分裂期までを1段階ずつ送り、染色体の動きとDNA量の変化を同時に確かめます。動物細胞と植物細胞の違いも比べられます。</span>
+<span class="tag">対応: 細胞周期・体細胞分裂・DNAの複製 / 所要 約15分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="osmosis.html">
+<span class="icon" aria-hidden="true">💧</span>
+<h2>浸透圧と細胞の変化</h2>
+<span>外液の濃度をスライダーで変え、赤血球の膨張・溶血・収縮と、植物細胞の吸水・原形質分離を観察します。水と溶質の動きも見られます。</span>
+<span class="tag">対応: 浸透・半透膜・細胞膜・原形質分離 / 所要 約15分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="photosynthesis.html">
+<span class="icon" aria-hidden="true">🌿</span>
+<h2>光合成と呼吸の速度グラフ</h2>
+<span>光の強さ・CO₂濃度・温度を変えて見かけの光合成速度を描き、光補償点・光飽和点・限定要因を読み取ります。陽生植物と陰生植物も比べられます。</span>
+<span class="tag">対応: 光合成と呼吸・光補償点・光飽和点・限定要因 / 所要 約20分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="enzyme.html">
+<span class="icon" aria-hidden="true">⚗️</span>
+<h2>酵素反応と反応速度</h2>
+<span>基質濃度・酵素量・温度・pHを変えて反応速度のグラフを描きます。基質と酵素の粒子の動きや、高温での失活(元に戻らない)も確かめられます。</span>
+<span class="tag">対応: 酵素のはたらき・基質特異性・最適温度・最適pH / 所要 約20分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="genetics.html">
+<span class="icon" aria-hidden="true">🌱</span>
+<h2>遺伝の基本(1遺伝子の交雑)</h2>
+<span>親の遺伝子型を選んでパンネット方形を作り、分離比を確かめます。交雑のシミュレーションと、検定交雑で遺伝子型を当てるゲーム付きです。</span>
+<span class="tag">対応: 遺伝子型と表現型・分離の法則・検定交雑 / 所要 約20分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="dna.html">
+<span class="icon" aria-hidden="true">🧬</span>
+<h2>DNAからタンパク質へ(転写・翻訳)</h2>
+<span>DNAの塩基配列からmRNA、アミノ酸への流れを1文字ずつたどります。塩基の置換や挿入・欠失(突然変異)の影響や、鎌状赤血球貧血の例、塩基の割合(シャルガフの規則)の演習もできます。</span>
+<span class="tag">対応: DNAの構造・転写と翻訳・遺伝暗号・突然変異 / 所要 約25分</span>
+<span class="go">開く →</span>
+</a>
+<a class="card" href="glucose.html">
+<span class="icon" aria-hidden="true">🩸</span>
+<h2>血糖値の調節(ホメオスタシス)</h2>
+<span>食事や運動で血糖値がどう変わり、インスリン・グルカゴンなどのはたらきでどう保たれるかを、時間を動かしながら観察します。糖尿病のしくみも比べられます。</span>
+<span class="tag">対応: 体内環境の維持・ホルモンによる調節・フィードバック・糖尿病 / 所要 約25分</span>
+<span class="go">開く →</span>
+</a>
+</div>
+<p class="lead" style="font-size:0.85rem">スマートフォン・タブレット・PCで利用できます。ライト/ダーク表示は右上のボタンで切り替えられます。</p>
+</main>
+<script>
+/* 共通JS: 乱数・クイズ・テーマ切替(ビルド時に各HTMLへインライン展開される) */
+const BioCommon = (function () {
+  'use strict';
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  function shuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /** 選択肢をシャッフルし、正解位置を付け替えた問題を返す */
+  function prepareQuestion(q, rng) {
+    const order = shuffle(q.choices.map((_, i) => i), rng);
+    return {
+      q: q.q,
+      choices: order.map((i) => q.choices[i]),
+      answer: order.indexOf(q.answer),
+      explain: q.explain,
+    };
+  }
+
+  /** クイズデータの検証(エラー文字列の配列を返す。空なら正常) */
+  function validateQuiz(quiz) {
+    const errs = [];
+    if (!Array.isArray(quiz) || quiz.length < 1) return ['quiz is empty'];
+    quiz.forEach((q, n) => {
+      const p = 'Q' + (n + 1) + ': ';
+      if (!q.q || typeof q.q !== 'string') errs.push(p + 'no question text');
+      if (!Array.isArray(q.choices) || q.choices.length !== 4) errs.push(p + 'needs exactly 4 choices');
+      else if (new Set(q.choices).size !== 4) errs.push(p + 'choices must be unique');
+      if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3) errs.push(p + 'answer index out of range');
+      if (!q.explain || q.explain.length < 10) errs.push(p + 'explanation missing');
+    });
+    return errs;
+  }
+
+  /* ---------- ブラウザ専用 ---------- */
+  const LABELS = ['ア', 'イ', 'ウ', 'エ'];
+
+  function el(tag, attrs, children) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach((c) => e.appendChild(c));
+    return e;
+  }
+
+  function mountQuiz(root, quizData, opts) {
+    const errs = validateQuiz(quizData);
+    if (errs.length) { root.textContent = 'クイズデータにエラー: ' + errs.join(' / '); return; }
+    const rng = (opts && opts.rng) || Math.random;
+    let qs, idx, score, missed, answered;
+
+    function start() {
+      qs = quizData.map((q) => prepareQuestion(q, rng));
+      idx = 0; score = 0; missed = []; answered = false;
+      render();
+    }
+
+    function render() {
+      root.textContent = '';
+      if (idx >= qs.length) return renderResult();
+      const q = qs[idx];
+      const head = el('div', { class: 'q-head' }, [
+        el('span', { text: '第' + (idx + 1) + '問 / 全' + qs.length + '問' }),
+        el('span', { text: '正解 ' + score + '問' }),
+      ]);
+      const text = el('div', { class: 'q-text', id: 'qtext-' + idx, text: q.q });
+      const list = el('div', { class: 'choices', role: 'group', 'aria-labelledby': 'qtext-' + idx });
+      q.choices.forEach((c, i) => {
+        const b = el('button', { type: 'button', class: 'choice', 'data-i': String(i) }, [
+          el('span', { class: 'mark', text: LABELS[i] }),
+          el('span', { text: c }),
+        ]);
+        b.addEventListener('click', () => choose(i, list, b));
+        list.appendChild(b);
+      });
+      const fb = el('div', { 'aria-live': 'polite' });
+      root.append(head, text, list, fb);
+      answered = false;
+    }
+
+    function choose(i, list, btn) {
+      if (answered) return;
+      answered = true;
+      const q = qs[idx];
+      const ok = i === q.answer;
+      if (ok) score++; else missed.push({ q: q.q, correct: q.choices[q.answer] });
+      [...list.children].forEach((b, n) => {
+        b.disabled = true;
+        const mark = b.querySelector('.mark');
+        if (n === q.answer) { b.classList.add('correct'); mark.textContent = '○'; }
+        else if (n === i) { b.classList.add('wrong'); mark.textContent = '×'; }
+      });
+      const fb = root.querySelector('[aria-live]');
+      fb.textContent = '';
+      const box = el('div', { class: 'feedback ' + (ok ? 'ok' : 'ng') }, [
+        el('div', { class: 'verdict', text: ok ? '○ 正解です' : '× 不正解 — 正解は「' + LABELS[q.answer] + '」です' }),
+        el('div', { text: q.explain }),
+      ]);
+      const next = el('button', { type: 'button', class: 'btn btn-primary', text: idx + 1 >= qs.length ? '結果を見る' : '次の問題へ' });
+      next.addEventListener('click', () => { idx++; render(); const f = root.querySelector('.q-text,.result-score'); if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); } });
+      box.appendChild(el('div', { class: 'btn-row' }, [next]));
+      fb.appendChild(box);
+    }
+
+    function renderResult() {
+      const pct = Math.round((score / qs.length) * 100);
+      root.append(el('div', { class: 'result-score', text: qs.length + '問中 ' + score + '問 正解(' + pct + '%)' }));
+      if (missed.length === 0) {
+        root.append(el('p', { text: '全問正解です。お見事!' }));
+      } else {
+        root.append(el('p', { text: 'まちがえた問題を見直しましょう。' }));
+        const ul = el('ul', { class: 'miss' });
+        missed.forEach((m) => ul.appendChild(el('li', { text: m.q + ' → 正解: ' + m.correct })));
+        root.append(ul);
+      }
+      const again = el('button', { type: 'button', class: 'btn btn-primary', text: 'もう一度挑戦する' });
+      again.addEventListener('click', start);
+      root.append(el('div', { class: 'btn-row' }, [again]));
+    }
+    start();
+  }
+
+  /* テーマ切替(保存はしない。ページを開き直すとOS設定に戻る) */
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    function effective() {
+      const t = document.documentElement.getAttribute('data-theme');
+      return t || (mq.matches ? 'dark' : 'light');
+    }
+    function label() { btn.textContent = effective() === 'dark' ? '☀ ライト表示にする' : '☾ ダーク表示にする'; }
+    btn.addEventListener('click', () => {
+      document.documentElement.setAttribute('data-theme', effective() === 'dark' ? 'light' : 'dark');
+      label();
+      document.dispatchEvent(new Event('themechange'));
+    });
+    if (mq.addEventListener) mq.addEventListener('change', () => { label(); document.dispatchEvent(new Event('themechange')); });
+    label();
+  }
+
+  /** CSS変数の現在値を取得(canvas描画用) */
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** prefers-reduced-motion */
+  function reducedMotion() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  const api = { mulberry32, clamp, lerp, ease, shuffle, prepareQuestion, validateQuiz, mountQuiz, initTheme, cssVar, reducedMotion };
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', initTheme);
+  return api;
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = BioCommon;
+
+</script>
+</body>
+</html>

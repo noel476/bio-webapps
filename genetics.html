@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遺伝の基本(1遺伝子の交雑)｜生物基礎 教材</title>
+<meta name="description" content="親の遺伝子型を選んでパンネット方形を作り、分離比を確かめます。交雑のシミュレーションと、検定交雑で遺伝子型を当てるゲーム付きです。">
+<style>
+/* 共通スタイル(ビルド時に各HTMLへインライン展開される) */
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-2: #eaf0ec;
+  --text: #17211d;
+  --muted: #455650;
+  --border: #b9c5be;
+  --accent: #00695c;
+  --accent-text: #ffffff;
+  --accent-soft: #d7ede8;
+  --focus: #0050c8;
+  --ok: #0b6b2f;
+  --ok-bg: #dff3e4;
+  --ng: #a3281d;
+  --ng-bg: #fbe4e0;
+  --note-bg: #fff4d6;
+  --note-border: #8a6200;
+  /* データ用色(Okabe-Ito 系・色覚多様性に配慮。必ず形/線種/文字も併用する) */
+  --c1: #0072b2;
+  --c2: #c04a00;
+  --c3: #a8508c;
+  --c4: #007a5a;
+  --cell-fill: #e3f1e8;
+  --cell-stroke: #2f5d44;
+  --nuc-fill: #d6e6f5;
+  --chromo: #7a2e8a;
+  --grid: #c9d3cd;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #1a2320;
+    --surface-2: #243029;
+    --text: #e9f0ec;
+    --muted: #b0bfb8;
+    --border: #46544d;
+    --accent: #5cc4b0;
+    --accent-text: #06211c;
+    --accent-soft: #1f3a34;
+    --focus: #8cb8ff;
+    --ok: #7fdc9a;
+    --ok-bg: #173a24;
+    --ng: #ff9d90;
+    --ng-bg: #4a1f1a;
+    --note-bg: #3a3012;
+    --note-border: #e0b84a;
+    --c1: #5db8f0;
+    --c2: #f0a060;
+    --c3: #e0a0d0;
+    --c4: #4fd6a8;
+    --cell-fill: #24382d;
+    --cell-stroke: #8fc9a8;
+    --nuc-fill: #263a52;
+    --chromo: #d9a0e8;
+    --grid: #3a4842;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #1a2320;
+  --surface-2: #243029;
+  --text: #e9f0ec;
+  --muted: #b0bfb8;
+  --border: #46544d;
+  --accent: #5cc4b0;
+  --accent-text: #06211c;
+  --accent-soft: #1f3a34;
+  --focus: #8cb8ff;
+  --ok: #7fdc9a;
+  --ok-bg: #173a24;
+  --ng: #ff9d90;
+  --ng-bg: #4a1f1a;
+  --note-bg: #3a3012;
+  --note-border: #e0b84a;
+  --c1: #5db8f0;
+  --c2: #f0a060;
+  --c3: #e0a0d0;
+  --c4: #4fd6a8;
+  --cell-fill: #24382d;
+  --cell-stroke: #8fc9a8;
+  --nuc-fill: #263a52;
+  --chromo: #d9a0e8;
+  --grid: #3a4842;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  line-height: 1.7;
+  font-size: 16px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
+.app-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.app-header .back { font-size: 0.9rem; white-space: nowrap; }
+.app-header h1 { font-size: 1.25rem; margin: 0; flex: 1 1 220px; line-height: 1.4; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lead { color: var(--muted); margin: 16px 0; }
+.lead b { color: var(--text); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin: 14px 0; box-shadow: var(--shadow);
+}
+.panel > h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.panel > h3 { font-size: 1rem; margin: 12px 0 4px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 780px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.btn {
+  font: inherit; min-height: 44px; min-width: 44px; padding: 6px 16px; border-radius: 10px;
+  border: 2px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.btn:hover { background: var(--accent-soft); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg label {
+  min-height: 44px; display: inline-flex; align-items: center; padding: 4px 14px; cursor: pointer;
+  border: 2px solid var(--border); border-radius: 10px; background: var(--surface); gap: 6px;
+}
+.seg input:checked + label { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.seg input:checked + label::before { content: "✓"; }
+.seg input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.ctl { margin: 10px 0; }
+.ctl > label, .ctl > .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: 0.95rem; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--accent); }
+.ctl input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); margin: 2px 0; }
+.ctl .hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+.note {
+  background: var(--note-bg); border-left: 6px solid var(--note-border); border-radius: 6px;
+  padding: 8px 12px; margin: 12px 0; font-size: 0.9rem;
+}
+.note::before { content: "※ 注意:"; font-weight: 700; margin-right: 4px; }
+.note.info::before { content: "ℹ 補足:"; }
+.badge {
+  display: inline-block; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--accent);
+  background: var(--accent-soft); font-weight: 700; font-size: 0.9rem;
+}
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0; }
+.readout > div { background: var(--surface-2); border-radius: 8px; padding: 6px 10px; }
+.readout .k { font-size: 0.78rem; color: var(--muted); display: block; }
+.readout .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+svg.fig, canvas.fig { width: 100%; height: auto; display: block; max-width: 100%; }
+svg text { font-family: inherit; fill: var(--text); }
+svg .axis { stroke: var(--text); stroke-width: 1.5; fill: none; }
+svg .grid { stroke: var(--grid); stroke-width: 1; }
+svg .muted-t { fill: var(--muted); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.tbl th, table.tbl td { border: 1px solid var(--border); padding: 4px 8px; text-align: center; }
+table.tbl th { background: var(--surface-2); }
+.scroll-x { overflow-x: auto; }
+
+/* クイズ */
+.quiz .q-head { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+.quiz .q-text { font-weight: 700; font-size: 1.05rem; margin: 6px 0 10px; }
+.quiz .choices { display: grid; gap: 8px; }
+.quiz .choice {
+  font: inherit; text-align: left; min-height: 48px; padding: 8px 12px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.quiz .choice:hover:not([disabled]) { border-color: var(--accent); background: var(--accent-soft); }
+.quiz .choice .mark { min-width: 1.6em; font-weight: 700; }
+.quiz .choice.correct { border-color: var(--ok); background: var(--ok-bg); }
+.quiz .choice.wrong { border-color: var(--ng); background: var(--ng-bg); }
+.quiz .choice[disabled] { cursor: default; color: var(--text); opacity: 1; }
+.quiz .feedback { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+.quiz .feedback .verdict { font-weight: 700; }
+.quiz .feedback.ok .verdict { color: var(--ok); }
+.quiz .feedback.ng .verdict { color: var(--ng); }
+.quiz .result-score { font-size: 1.4rem; font-weight: 700; }
+.quiz ul.miss { padding-left: 1.2em; }
+
+/* 一覧ページ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.card {
+  display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px; box-shadow: var(--shadow);
+}
+.card:hover { border-color: var(--accent); }
+.card h2 { margin: 0; font-size: 1.1rem; }
+.card .icon { font-size: 2rem; line-height: 1; }
+.card .tag { font-size: 0.82rem; color: var(--muted); }
+.card .go { margin-top: auto; font-weight: 700; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+:root { --seedY: #e8c52c; --seedG: #5aa04a; --petal: #8e55c0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --seedY: #d9b72a; --seedG: #6bb85a; --petal: #b583e0; } }
+:root[data-theme="dark"] { --seedY: #d9b72a; --seedG: #6bb85a; --petal: #b583e0; }
+table.punnett { border-collapse: collapse; margin: 6px auto; }
+table.punnett th, table.punnett td { border: 2px solid var(--border); padding: 6px 8px; text-align: center; min-width: 76px; }
+table.punnett th { background: var(--surface-2); font-weight: 700; }
+table.punnett td.dom { background: var(--surface); }
+table.punnett td.rec { background: var(--surface-2); border-style: dashed; }
+table.punnett td small { display: block; color: var(--muted); }
+table.punnett td b { font-size: 1.2rem; }
+.kid { width: 44px; height: 48px; text-align: center; font-size: 0.7rem; line-height: 1; }
+#chart { max-width: 620px; margin: 0 auto; }
+
+</style>
+</head>
+<body>
+<header class="app-header">
+<a class="back" href="index.html">← 教材一覧</a>
+<h1>遺伝の基本(1遺伝子の交雑)</h1>
+<button id="theme-toggle" class="btn" type="button" aria-label="表示テーマの切り替え">表示切替</button>
+</header>
+<main class="wrap">
+<p class="lead"><b>ねらい:</b> 親の<b>遺伝子型</b>から子の遺伝子型・表現型の比を予測し(パンネット方形)、実際に交雑をくり返して<b>偶然によるずれ</b>を体験し、<b>検定交雑</b>で見えない遺伝子型を推理します。なお「顕性(優性)」「潜性(劣性)」はどちらの用語も併記しています。</p>
+
+<section class="panel" aria-labelledby="tr-h">
+  <h2 id="tr-h">調べる形質(エンドウ)</h2>
+  <div class="seg" role="radiogroup" aria-label="形質">
+    <input type="radio" name="trait" id="t-seed" value="seed" checked><label for="t-seed">種子の形(丸/しわ)</label>
+    <input type="radio" name="trait" id="t-color" value="color"><label for="t-color">子葉の色(黄/緑)</label>
+    <input type="radio" name="trait" id="t-flower" value="flower"><label for="t-flower">花の色(紫/白)</label>
+  </div>
+  <p id="trait-note" class="hint" style="margin:4px 0;color:var(--muted)"></p>
+  <div class="seg" role="radiogroup" aria-label="学習の方法">
+    <input type="radio" name="tab" id="tab-1" value="1" checked><label for="tab-1">① パンネット方形</label>
+    <input type="radio" name="tab" id="tab-2" value="2"><label for="tab-2">② 交雑シミュレーション</label>
+    <input type="radio" name="tab" id="tab-3" value="3"><label for="tab-3">③ 検定交雑ゲーム</label>
+  </div>
+</section>
+
+<div id="pane-1">
+  <div class="grid-2">
+    <section class="panel" aria-labelledby="par-h">
+      <h2 id="par-h">親の遺伝子型を選ぶ</h2>
+      <p style="margin:4px 0;font-weight:700">親1</p>
+      <div class="seg" role="radiogroup" aria-label="親1の遺伝子型" id="seg-p1"></div>
+      <p style="margin:4px 0;font-weight:700">親2</p>
+      <div class="seg" role="radiogroup" aria-label="親2の遺伝子型" id="seg-p2"></div>
+      <div class="btn-row" id="presets"></div>
+      <p id="par-desc"></p>
+    </section>
+    <section class="panel" aria-labelledby="pn-h">
+      <h2 id="pn-h">パンネット方形</h2>
+      <div class="scroll-x"><table class="punnett" id="punnett"></table></div>
+      <div class="readout">
+        <div><span class="k">遺伝子型の比</span><span class="v" id="r-geno"></span></div>
+        <div><span class="k">表現型の比</span><span class="v" id="r-pheno"></span></div>
+      </div>
+      <p id="r-note" aria-live="polite"></p>
+    </section>
+  </div>
+</div>
+
+<div id="pane-2" hidden>
+  <section class="panel" aria-labelledby="sim-h">
+    <h2 id="sim-h">交雑シミュレーション(① で選んだ親どうし)</h2>
+    <p id="sim-parents" style="font-weight:700"></p>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" data-add="1">子を1個体ふやす</button>
+      <button class="btn" type="button" data-add="10">+10個体</button>
+      <button class="btn" type="button" data-add="100">+100個体</button>
+      <button class="btn" type="button" data-add="1000">+1000個体</button>
+      <button class="btn" type="button" id="sim-reset">リセット</button>
+    </div>
+    <svg id="chart" class="fig" viewBox="0 0 440 260" role="img" aria-label="子の遺伝子型の個体数のグラフ"></svg>
+    <div class="readout">
+      <div><span class="k">得た子の数</span><span class="v" id="s-n"></span></div>
+      <div><span class="k" id="s-pk"></span><span class="v" id="s-pv"></span></div>
+      <div><span class="k">理論上の表現型の比</span><span class="v" id="s-theory"></span></div>
+    </div>
+    <p id="s-note"></p>
+    <p class="note info">グラフの◇印は、理論どおりなら期待される個体数です。個体数が少ないうちは◇からずれやすく、多くなるほど近づくことを確かめましょう。</p>
+  </section>
+</div>
+
+<div id="pane-3" hidden>
+  <section class="panel" aria-labelledby="g-h">
+    <h2 id="g-h">検定交雑ゲーム: 見えない遺伝子型を当てよう</h2>
+    <p>顕性の形質を示す「謎の個体」がいます。遺伝子型は <b id="g-a"></b>(ホモ接合)か <b id="g-b"></b>(ヘテロ接合)のどちらかです。潜性ホモ(<b id="g-c"></b>)と交雑して、子の表現型から推理しましょう。</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <div><div id="g-mystery" aria-hidden="true"></div><div id="g-mlabel" style="text-align:center;font-weight:700"></div></div>
+      <div style="font-size:1.6rem" aria-hidden="true">×</div>
+      <div><div id="g-tester" aria-hidden="true"></div><div id="g-tlabel" style="text-align:center;font-weight:700"></div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" id="g-cross">交雑して子を1個体得る</button>
+      <button class="btn" type="button" id="g-cross5">5個体まとめて</button>
+    </div>
+    <p>得られた子(新しい順に表示):</p>
+    <div id="g-kids" style="display:flex;flex-wrap:wrap;gap:4px;min-height:48px" aria-live="polite"></div>
+    <p id="g-stat"></p>
+    <p><b>この個体の遺伝子型は?</b></p>
+    <div class="btn-row">
+      <button class="btn" type="button" id="g-ans-hom"></button>
+      <button class="btn" type="button" id="g-ans-het"></button>
+    </div>
+    <p id="g-fb" aria-live="polite" style="font-weight:700"></p>
+    <div class="btn-row"><button class="btn btn-primary" type="button" id="g-next" hidden>次の個体に挑戦</button></div>
+    <p>成績: <b id="g-score">0 / 0</b></p>
+    <p class="note info">子が1個体でも潜性なら、謎の個体は必ずヘテロ接合です。逆に、子がすべて顕性でも、子の数が少ないとヘテロ接合の可能性は残ります。何個体しらべれば安心できるでしょう?</p>
+  </section>
+</div>
+
+<section class="panel">
+  <h2>用語メモ</h2>
+  <ul>
+    <li><b>遺伝子型</b>: 遺伝子の組み合わせ(例: RR, Rr, rr)。<b>表現型</b>: 実際に現れる形質(例: 丸, しわ)。</li>
+    <li><b>ホモ接合</b>: 同じ遺伝子の組み合わせ(RR, rr)。<b>ヘテロ接合</b>: 異なる遺伝子の組み合わせ(Rr)。</li>
+    <li><b>顕性(優性)の形質</b>: 雑種(ヘテロ)で現れる形質。<b>潜性(劣性)の形質</b>: 雑種では現れない形質。</li>
+    <li><b>分離の法則</b>: 対立遺伝子は、配偶子ができるときに別々の配偶子に分かれて入る。</li>
+  </ul>
+  <p class="note">この教材は、1つの遺伝子だけが形質を決め、顕性・潜性の関係が完全で、遺伝子は連鎖しない、という単純な場合だけをあつかいます。実際の形質には、不完全優性や複数の遺伝子が関わるものも多くあります。モデルとして単純化していることに注意してください。</p>
+</section>
+
+<section class="panel quiz" aria-labelledby="quiz-h"><h2 id="quiz-h">確認クイズ(4択)</h2><div id="quiz"></div></section>
+<p class="lead" style="font-size:0.85rem">このページは個人情報を扱わず、入力内容の保存やサーバ通信を行いません。(自動生成ファイル: 編集は <code>_src/</code> 側で行い <code>node build.mjs</code> で再生成)</p>
+</main>
+<script>
+/* 共通JS: 乱数・クイズ・テーマ切替(ビルド時に各HTMLへインライン展開される) */
+const BioCommon = (function () {
+  'use strict';
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  function shuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /** 選択肢をシャッフルし、正解位置を付け替えた問題を返す */
+  function prepareQuestion(q, rng) {
+    const order = shuffle(q.choices.map((_, i) => i), rng);
+    return {
+      q: q.q,
+      choices: order.map((i) => q.choices[i]),
+      answer: order.indexOf(q.answer),
+      explain: q.explain,
+    };
+  }
+
+  /** クイズデータの検証(エラー文字列の配列を返す。空なら正常) */
+  function validateQuiz(quiz) {
+    const errs = [];
+    if (!Array.isArray(quiz) || quiz.length < 1) return ['quiz is empty'];
+    quiz.forEach((q, n) => {
+      const p = 'Q' + (n + 1) + ': ';
+      if (!q.q || typeof q.q !== 'string') errs.push(p + 'no question text');
+      if (!Array.isArray(q.choices) || q.choices.length !== 4) errs.push(p + 'needs exactly 4 choices');
+      else if (new Set(q.choices).size !== 4) errs.push(p + 'choices must be unique');
+      if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3) errs.push(p + 'answer index out of range');
+      if (!q.explain || q.explain.length < 10) errs.push(p + 'explanation missing');
+    });
+    return errs;
+  }
+
+  /* ---------- ブラウザ専用 ---------- */
+  const LABELS = ['ア', 'イ', 'ウ', 'エ'];
+
+  function el(tag, attrs, children) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach((c) => e.appendChild(c));
+    return e;
+  }
+
+  function mountQuiz(root, quizData, opts) {
+    const errs = validateQuiz(quizData);
+    if (errs.length) { root.textContent = 'クイズデータにエラー: ' + errs.join(' / '); return; }
+    const rng = (opts && opts.rng) || Math.random;
+    let qs, idx, score, missed, answered;
+
+    function start() {
+      qs = quizData.map((q) => prepareQuestion(q, rng));
+      idx = 0; score = 0; missed = []; answered = false;
+      render();
+    }
+
+    function render() {
+      root.textContent = '';
+      if (idx >= qs.length) return renderResult();
+      const q = qs[idx];
+      const head = el('div', { class: 'q-head' }, [
+        el('span', { text: '第' + (idx + 1) + '問 / 全' + qs.length + '問' }),
+        el('span', { text: '正解 ' + score + '問' }),
+      ]);
+      const text = el('div', { class: 'q-text', id: 'qtext-' + idx, text: q.q });
+      const list = el('div', { class: 'choices', role: 'group', 'aria-labelledby': 'qtext-' + idx });
+      q.choices.forEach((c, i) => {
+        const b = el('button', { type: 'button', class: 'choice', 'data-i': String(i) }, [
+          el('span', { class: 'mark', text: LABELS[i] }),
+          el('span', { text: c }),
+        ]);
+        b.addEventListener('click', () => choose(i, list, b));
+        list.appendChild(b);
+      });
+      const fb = el('div', { 'aria-live': 'polite' });
+      root.append(head, text, list, fb);
+      answered = false;
+    }
+
+    function choose(i, list, btn) {
+      if (answered) return;
+      answered = true;
+      const q = qs[idx];
+      const ok = i === q.answer;
+      if (ok) score++; else missed.push({ q: q.q, correct: q.choices[q.answer] });
+      [...list.children].forEach((b, n) => {
+        b.disabled = true;
+        const mark = b.querySelector('.mark');
+        if (n === q.answer) { b.classList.add('correct'); mark.textContent = '○'; }
+        else if (n === i) { b.classList.add('wrong'); mark.textContent = '×'; }
+      });
+      const fb = root.querySelector('[aria-live]');
+      fb.textContent = '';
+      const box = el('div', { class: 'feedback ' + (ok ? 'ok' : 'ng') }, [
+        el('div', { class: 'verdict', text: ok ? '○ 正解です' : '× 不正解 — 正解は「' + LABELS[q.answer] + '」です' }),
+        el('div', { text: q.explain }),
+      ]);
+      const next = el('button', { type: 'button', class: 'btn btn-primary', text: idx + 1 >= qs.length ? '結果を見る' : '次の問題へ' });
+      next.addEventListener('click', () => { idx++; render(); const f = root.querySelector('.q-text,.result-score'); if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); } });
+      box.appendChild(el('div', { class: 'btn-row' }, [next]));
+      fb.appendChild(box);
+    }
+
+    function renderResult() {
+      const pct = Math.round((score / qs.length) * 100);
+      root.append(el('div', { class: 'result-score', text: qs.length + '問中 ' + score + '問 正解(' + pct + '%)' }));
+      if (missed.length === 0) {
+        root.append(el('p', { text: '全問正解です。お見事!' }));
+      } else {
+        root.append(el('p', { text: 'まちがえた問題を見直しましょう。' }));
+        const ul = el('ul', { class: 'miss' });
+        missed.forEach((m) => ul.appendChild(el('li', { text: m.q + ' → 正解: ' + m.correct })));
+        root.append(ul);
+      }
+      const again = el('button', { type: 'button', class: 'btn btn-primary', text: 'もう一度挑戦する' });
+      again.addEventListener('click', start);
+      root.append(el('div', { class: 'btn-row' }, [again]));
+    }
+    start();
+  }
+
+  /* テーマ切替(保存はしない。ページを開き直すとOS設定に戻る) */
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    function effective() {
+      const t = document.documentElement.getAttribute('data-theme');
+      return t || (mq.matches ? 'dark' : 'light');
+    }
+    function label() { btn.textContent = effective() === 'dark' ? '☀ ライト表示にする' : '☾ ダーク表示にする'; }
+    btn.addEventListener('click', () => {
+      document.documentElement.setAttribute('data-theme', effective() === 'dark' ? 'light' : 'dark');
+      label();
+      document.dispatchEvent(new Event('themechange'));
+    });
+    if (mq.addEventListener) mq.addEventListener('change', () => { label(); document.dispatchEvent(new Event('themechange')); });
+    label();
+  }
+
+  /** CSS変数の現在値を取得(canvas描画用) */
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** prefers-reduced-motion */
+  function reducedMotion() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  const api = { mulberry32, clamp, lerp, ease, shuffle, prepareQuestion, validateQuiz, mountQuiz, initTheme, cssVar, reducedMotion };
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', initTheme);
+  return api;
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = BioCommon;
+
+/* 遺伝の基本(1遺伝子の交雑): 純粋ロジック(Nodeでテスト可能) */
+const GeneticsLogic = (function () {
+  'use strict';
+  const TRAITS = {
+    seed: { name: '種子の形', letter: 'R', dom: '丸', rec: 'しわ', species: 'エンドウ' },
+    color: { name: '子葉の色', letter: 'Y', dom: '黄色', rec: '緑色', species: 'エンドウ' },
+    flower: { name: '花の色', letter: 'P', dom: '紫', rec: '白', species: 'エンドウ' },
+  };
+  /** 遺伝子型を正規化(大文字=顕性を先に) 例: 'rR' → 'Rr' */
+  function norm(g) {
+    const a = g.split('').sort((x, y) => (x === x.toUpperCase() ? -1 : 1) - (y === y.toUpperCase() ? -1 : 1));
+    return a.join('');
+  }
+  function genotypes(trait) { const L = TRAITS[trait].letter, l = L.toLowerCase(); return [L + L, L + l, l + l]; }
+  /** 配偶子(アレル2つ。同じアレルでも2つ並べる) */
+  function gametes(g) { return g.split(''); }
+  /** 顕性の形質を示すか */
+  function isDominant(g) { return g.split('').some((c) => c === c.toUpperCase()); }
+  /** 2×2のパンネット方形: rows[i][j] = 親1の配偶子i と 親2の配偶子j の子の遺伝子型 */
+  function punnett(g1, g2) {
+    const a = gametes(g1), b = gametes(g2);
+    return a.map((x) => b.map((y) => norm(x + y)));
+  }
+  function genotypeCounts(g1, g2, trait) {
+    const gts = genotypes(trait), c = { [gts[0]]: 0, [gts[1]]: 0, [gts[2]]: 0 };
+    punnett(g1, g2).flat().forEach((g) => { c[g]++; });
+    return c;
+  }
+  function phenotypeCounts(g1, g2) {
+    let dom = 0, rec = 0;
+    punnett(g1, g2).flat().forEach((g) => { if (isDominant(g)) dom++; else rec++; });
+    return { dom, rec };
+  }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  /** 整数比に簡約(0は0のまま) */
+  function simplify(arr) {
+    const nz = arr.filter((x) => x > 0);
+    if (!nz.length) return arr.slice();
+    const g = nz.reduce((a, b) => gcd(a, b));
+    return arr.map((x) => x / g);
+  }
+  /** 理論的な確率(子が各遺伝子型になる確率) */
+  function probabilities(g1, g2, trait) {
+    const c = genotypeCounts(g1, g2, trait), o = {};
+    Object.keys(c).forEach((k) => { o[k] = c[k] / 4; });
+    return o;
+  }
+  /** n個体の子を乱数でつくる(rngは0〜1の乱数関数) */
+  function simulate(g1, g2, n, rng, trait, into) {
+    const gts = genotypes(trait);
+    const c = into || { [gts[0]]: 0, [gts[1]]: 0, [gts[2]]: 0 };
+    for (let i = 0; i < n; i++) {
+      const a = g1[Math.floor(rng() * 2)], b = g2[Math.floor(rng() * 2)];
+      c[norm(a + b)]++;
+    }
+    return c;
+  }
+  function phenoFromGeno(c) {
+    let dom = 0, rec = 0;
+    Object.keys(c).forEach((g) => { if (isDominant(g)) dom += c[g]; else rec += c[g]; });
+    return { dom, rec };
+  }
+  /** 検定交雑: 顕性の個体(AA か Aa)を aa と交雑して n 個体得たとき、
+      Aa なのに潜性が1個体も出ない確率 = (1/2)^n */
+  function missProbability(n) { return Math.pow(0.5, n); }
+  /** 謎の個体の遺伝子型をランダムに決める(顕性の表現型のもの) */
+  function mystery(trait, rng) { const gts = genotypes(trait); return rng() < 0.5 ? gts[0] : gts[1]; }
+
+  return { TRAITS, norm, genotypes, gametes, isDominant, punnett, genotypeCounts, phenotypeCounts, simplify, probabilities, simulate, phenoFromGeno, missProbability, mystery };
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = GeneticsLogic;
+
+const QUIZ = [
+  { q: '遺伝子型 Aa どうしを交雑したとき、子の表現型の比(顕性:潜性)はどうなりますか。', choices: ['1 : 1', '3 : 1', '2 : 1', '1 : 2 : 1'], answer: 1,
+    explain: '子の遺伝子型は AA : Aa : aa = 1 : 2 : 1 で、AAとAaは顕性の形質を示すため、表現型の比は顕性 : 潜性 = 3 : 1 になります。' },
+  { q: '純系の顕性(AA)と純系の潜性(aa)を交雑したときの子(雑種第一代)の遺伝子型はどうなりますか。', choices: ['すべて AA', 'すべて Aa', 'AA : aa = 1 : 1', 'Aa : aa = 1 : 1'], answer: 1,
+    explain: 'AAからは必ずA、aaからは必ずaの配偶子ができるので、子はすべてAaになります。表現型はすべて顕性です。' },
+  { q: '遺伝子型 Aa の個体がつくる配偶子の遺伝子と割合として正しいものはどれですか。', choices: ['Aaが1種類', 'A : a = 1 : 1', 'A : a = 3 : 1', 'Aだけ'], answer: 1,
+    explain: '減数分裂で対立遺伝子Aとaがべつべつの配偶子に分かれる(分離の法則)ので、AとaはおよそA : a = 1 : 1 の配偶子になります。' },
+  { q: '遺伝子型 Aa と aa を交雑したとき、子の表現型の比(顕性:潜性)はどうなりますか。', choices: ['すべて顕性', '1 : 1', '3 : 1', 'すべて潜性'], answer: 1,
+    explain: 'Aaの配偶子はAとaが1:1、aaの配偶子はaだけなので、子はAa : aa = 1 : 1 になり、顕性 : 潜性 = 1 : 1 です。' },
+  { q: '検定交雑の目的として正しいものはどれですか。', choices: ['新しい遺伝子をつくる', '顕性の形質を示す個体の遺伝子型(AAかAaか)を調べる', '潜性の個体を増やす', '突然変異をおこす'], answer: 1,
+    explain: '顕性の表現型の個体は AA か Aa か見た目では区別できません。潜性ホモ(aa)と交雑して、子に潜性の形質が現れるかどうかで判断します。' },
+  { q: '検定交雑で、子が多数得られ、そのすべてが顕性の形質を示した。調べた個体の遺伝子型として最も可能性が高いのはどれですか。', choices: ['AA', 'Aa', 'aa', 'どれも同じ可能性'], answer: 0,
+    explain: 'Aaであれば子の半分は潜性になるはずなので、子が多数いてすべて顕性なら AA の可能性が高いといえます。ただし子の数が少ないと、Aaでも偶然すべて顕性になることがあります。' },
+  { q: '遺伝子型が RR の個体と Rr の個体について正しいものはどれですか。(Rは顕性遺伝子)', choices: ['表現型は異なる', '表現型は同じだが遺伝子型は異なる', '遺伝子型も表現型も同じ', 'RRは潜性の形質を示す'], answer: 1,
+    explain: 'RRもRrも顕性の形質(丸)を示すので表現型は同じですが、遺伝子型はRR(ホモ接合)とRr(ヘテロ接合)で異なります。' },
+  { q: 'Aa × Aa の交雑で、400個体の子が得られたとき、潜性の形質を示す個体は理論上およそ何個体ですか。', choices: ['100個体', '133個体', '200個体', '300個体'], answer: 0,
+    explain: '潜性(aa)の割合は 1/4 なので、400 × 1/4 = 100 個体が期待されます。実際の個体数は偶然によって多少ずれます。' },
+  { q: '少数の子を得たとき、実際の比が 3 : 1 からずれることが多いのはなぜですか。', choices: ['分離の法則が成り立たないから', '配偶子の組み合わせが偶然で決まるから', '遺伝子が突然変異したから', '潜性の遺伝子が消えるから'], answer: 1,
+    explain: 'どの配偶子どうしが受精するかは偶然で決まるため、個体数が少ないと理論比からずれやすく、個体数が多くなるほど理論比に近づきます。' },
+];
+
+(function () {
+  'use strict';
+  const L = GeneticsLogic, C = BioCommon;
+  const $ = (id) => document.getElementById(id);
+  const f1 = (n) => n.toFixed(1);
+  const rand = Math.random;
+  let trait = 'seed', i1 = 1, i2 = 1;            // 親の遺伝子型(0=ホモ顕性,1=ヘテロ,2=ホモ潜性)
+  let sim = null;
+
+  const T = () => L.TRAITS[trait];
+  const gts = () => L.genotypes(trait);
+  const label = (dom) => (dom ? T().dom : T().rec);
+  const phLabel = (g) => label(L.isDominant(g));
+
+  /* ---- 形質のイラスト ---- */
+  function icon(dom, size) {
+    const s = size || 40;
+    let b = '';
+    if (trait === 'seed') {
+      if (dom) b = `<circle cx="20" cy="20" r="15" fill="var(--seedY)" stroke="var(--text)" stroke-width="2.5"/>`;
+      else {
+        const pts = []; for (let k = 0; k < 36; k++) { const t = (k / 36) * 6.283, r = 15 + 2.2 * Math.sin(9 * t); pts.push(f1(20 + Math.cos(t) * r) + ',' + f1(20 + Math.sin(t) * r)); }
+        b = `<polygon points="${pts.join(' ')}" fill="var(--seedY)" stroke="var(--text)" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 17 Q16 21 12 26 M24 12 Q28 18 25 23 M20 27 Q24 30 29 27" stroke="var(--text)" stroke-width="1.6" fill="none"/>`;
+      }
+    } else if (trait === 'color') {
+      b = `<circle cx="20" cy="20" r="15" fill="${dom ? 'var(--seedY)' : 'var(--seedG)'}" stroke="var(--text)" stroke-width="2.5"/><text x="20" y="26" font-size="16" font-weight="700" text-anchor="middle" style="fill:#111">${dom ? '黄' : '緑'}</text>`;
+    } else {
+      let p = '';
+      for (let k = 0; k < 5; k++) { const a = (k / 5) * 6.283 - 1.57; p += `<circle cx="${f1(20 + Math.cos(a) * 9)}" cy="${f1(20 + Math.sin(a) * 9)}" r="7" fill="${dom ? 'var(--petal)' : 'var(--surface)'}" stroke="var(--text)" stroke-width="2" ${dom ? '' : 'stroke-dasharray="3 2"'}/>`; }
+      b = p + `<circle cx="20" cy="20" r="4.5" fill="${dom ? 'var(--surface)' : 'var(--seedY)'}" stroke="var(--text)" stroke-width="1.5"/>`;
+    }
+    return `<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true">${b}</svg>`;
+  }
+
+  /* ---- ① パンネット方形 ---- */
+  function ratioText(counts, names) {
+    const r = L.simplify(counts);
+    const only = counts.filter((x) => x > 0).length === 1;
+    return names.join(' : ') + ' = ' + r.join(' : ') + (only ? '(すべて ' + names[counts.findIndex((x) => x > 0)] + ')' : '');
+  }
+  function renderPunnett() {
+    const g = gts(), p1 = g[i1], p2 = g[i2];
+    const A = L.gametes(p1), B = L.gametes(p2), grid = L.punnett(p1, p2);
+    let h = `<caption class="sr-only">親1(${p1})と親2(${p2})のパンネット方形</caption><tr><th scope="col"><small>配偶子 →</small></th>${B.map((x) => `<th scope="col">${x}</th>`).join('')}</tr>`;
+    grid.forEach((row, r) => {
+      h += `<tr><th scope="row">${A[r]}</th>` + row.map((gt) => { const d = L.isDominant(gt); return `<td class="${d ? 'dom' : 'rec'}">${icon(d, 36)}<b>${gt}</b><small>${phLabel(gt)}(${d ? '顕性' : '潜性'})</small></td>`; }).join('') + '</tr>';
+    });
+    $('punnett').innerHTML = h;
+    const gc = L.genotypeCounts(p1, p2, trait), pc = L.phenotypeCounts(p1, p2);
+    $('r-geno').textContent = ratioText(g.map((x) => gc[x]), g);
+    $('r-pheno').textContent = ratioText([pc.dom, pc.rec], [T().dom, T().rec]);
+    $('par-desc').textContent = `親1は ${p1}(${phLabel(p1)}・${p1[0] === p1[1] ? 'ホモ接合' : 'ヘテロ接合'})、親2は ${p2}(${phLabel(p2)}・${p2[0] === p2[1] ? 'ホモ接合' : 'ヘテロ接合'})。`;
+    let note = '';
+    if (p1 === p2 && p1[0] !== p1[1]) note = '雑種どうしの交雑です。子の遺伝子型は 1 : 2 : 1、表現型は 3 : 1 になります。';
+    else if ((p1[0] !== p1[1] && p2 === g[2]) || (p2[0] !== p2[1] && p1 === g[2])) note = '雑種と潜性ホモの交雑(検定交雑)です。子の表現型は 1 : 1 になります。';
+    else if ((p1 === g[0] && p2 === g[2]) || (p1 === g[2] && p2 === g[0])) note = '純系どうしの交雑です。子は全員ヘテロ接合で、表現型はすべて顕性になります。';
+    $('r-note').textContent = note;
+    $('punnett').setAttribute('aria-label', `パンネット方形。遺伝子型の比 ${$('r-geno').textContent}。表現型の比 ${$('r-pheno').textContent}`);
+  }
+  function renderParents() {
+    const g = gts();
+    ['p1', 'p2'].forEach((p, k) => {
+      const cur = k ? i2 : i1;
+      $('seg-' + p).innerHTML = g.map((x, i) => `<input type="radio" name="${p}" id="${p}-${i}" value="${i}" ${i === cur ? 'checked' : ''}><label for="${p}-${i}">${x}<small style="font-weight:400">(${phLabel(x)})</small></label>`).join('');
+      [...$('seg-' + p).querySelectorAll('input')].forEach((r) => r.addEventListener('change', () => { if (k) i2 = Number(r.value); else i1 = Number(r.value); afterParents(); }));
+    });
+    const pre = [[1, 1, '雑種どうし(' + g[1] + '×' + g[1] + ')'], [1, 2, '検定交雑(' + g[1] + '×' + g[2] + ')'], [0, 2, '純系どうし(' + g[0] + '×' + g[2] + ')']];
+    $('presets').innerHTML = pre.map(([a, b, t]) => `<button type="button" class="btn" data-a="${a}" data-b="${b}">${t}</button>`).join('');
+    [...$('presets').children].forEach((bt) => bt.addEventListener('click', () => { i1 = Number(bt.dataset.a); i2 = Number(bt.dataset.b); renderParents(); afterParents(); }));
+  }
+  function afterParents() { renderPunnett(); resetSim(); }
+
+  /* ---- ② シミュレーション ---- */
+  function resetSim() { sim = { n: 0, counts: Object.fromEntries(gts().map((x) => [x, 0])) }; renderSim(); }
+  function renderSim() {
+    const g = gts(), p1 = g[i1], p2 = g[i2];
+    $('sim-parents').textContent = `親1 ${p1}(${phLabel(p1)}) × 親2 ${p2}(${phLabel(p2)})`;
+    const pr = L.probabilities(p1, p2, trait);
+    const n = sim.n;
+    const ymaxRaw = Math.max(1, ...g.map((x) => Math.max(sim.counts[x], pr[x] * n)));
+    const ymax = niceCeil(ymaxRaw * 1.1);
+    const X0 = 56, X1 = 428, Y1 = 14, Y0 = 200, W = X1 - X0, H = Y0 - Y1, py = (v) => Y0 - (v / ymax) * H;
+    let s = `<defs><pattern id="pA" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--c1)"/></pattern><pattern id="pB" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="var(--surface)"/><line x1="0" y1="0" x2="0" y2="8" stroke="var(--c2)" stroke-width="5"/></pattern><pattern id="pC" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--surface)"/><circle cx="4" cy="4" r="2.2" fill="var(--c4)"/></pattern></defs>`;
+    for (const y of [0, ymax / 2, ymax]) s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${f1(py(y))}" y2="${f1(py(y))}"/><text x="${X0 - 6}" y="${f1(py(y) + 5)}" font-size="16" text-anchor="end">${Math.round(y)}</text>`;
+    s += `<line class="axis" x1="${X0}" y1="${Y1 - 4}" x2="${X0}" y2="${Y0}"/><line class="axis" x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}"/>`;
+    const bw = W / 3 * 0.5;
+    g.forEach((x, i) => {
+      const cx = X0 + W * (i + 0.5) / 3, v = sim.counts[x];
+      s += `<rect x="${f1(cx - bw / 2)}" y="${f1(py(v))}" width="${f1(bw)}" height="${f1(Y0 - py(v))}" fill="url(#p${'ABC'[i]})" stroke="var(--text)" stroke-width="2"/>`;
+      s += `<text x="${f1(cx)}" y="${f1(Math.min(py(v) - 6, Y0 - 6))}" font-size="16" font-weight="700" text-anchor="middle">${v}</text>`;
+      s += `<text x="${f1(cx)}" y="${Y0 + 22}" font-size="16" text-anchor="middle" font-weight="700">${x}</text><text x="${f1(cx)}" y="${Y0 + 42}" font-size="14" text-anchor="middle" class="muted-t">${phLabel(x)}</text>`;
+      const ex = pr[x] * n;
+      s += `<g transform="translate(${f1(cx + bw / 2 + 14)},${f1(py(ex))})"><rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="var(--surface)" stroke="var(--text)" stroke-width="2.2"/></g>`;
+    });
+    s += `<text x="14" y="${(Y0 + Y1) / 2}" font-size="15" text-anchor="middle" transform="rotate(-90 14 ${(Y0 + Y1) / 2})">個体数</text>`;
+    $('chart').innerHTML = s;
+    const ph = L.phenoFromGeno(sim.counts), th = L.phenotypeCounts(p1, p2);
+    $('s-n').textContent = n + ' 個体';
+    const domN = ph.dom, recN = ph.rec;
+    $('s-pk').textContent = `${T().dom} : ${T().rec}(実際の個体数)`;
+    $('s-pv').textContent = `${domN} : ${recN}`;
+    $('s-theory').textContent = th.rec === 0 ? 'すべて' + T().dom : (th.dom === 0 ? 'すべて' + T().rec : L.simplify([th.dom, th.rec]).join(' : '));
+    let note = '';
+    if (n === 0) note = '「子を1個体ふやす」ボタンで、親から子をつくってみましょう。';
+    else if (th.dom > 0 && th.rec > 0) note = recN > 0 ? `実際の比は約 ${(domN / recN).toFixed(2)} : 1(理論は ${(th.dom / th.rec).toFixed(2)} : 1)。個体数を増やすと理論の比に近づきます。` : `まだ${T().rec}の個体が出ていません。個体数が少ないと、こうした偏りが起こります。`;
+    else note = '理論上、子の表現型はすべて同じになります。';
+    $('s-note').textContent = note;
+    $('chart').setAttribute('aria-label', `子の遺伝子型の個体数。${g.map((x) => x + ' が ' + sim.counts[x] + ' 個体').join('、')}。合計 ${n} 個体。`);
+  }
+  function niceCeil(x) { const a = [4, 8, 10, 20, 40, 100, 200, 400, 1000, 2000, 4000, 10000]; return a.find((v) => v >= x) || Math.ceil(x / 1000) * 1000; }
+
+  /* ---- ③ 検定交雑ゲーム ---- */
+  let game = null, score = [0, 0];
+  function newGame() {
+    const g = gts();
+    game = { geno: L.mystery(trait, rand), kids: [], answered: false };
+    $('g-a').textContent = g[0]; $('g-b').textContent = g[1]; $('g-c').textContent = g[2];
+    $('g-mystery').innerHTML = icon(true, 64); $('g-mlabel').textContent = `謎の個体(${T().dom}・遺伝子型は?)`;
+    $('g-tester').innerHTML = icon(false, 64); $('g-tlabel').textContent = `${g[2]}(${T().rec})`;
+    $('g-ans-hom').textContent = `${g[0]}(ホモ接合)`; $('g-ans-het').textContent = `${g[1]}(ヘテロ接合)`;
+    $('g-fb').textContent = ''; $('g-next').hidden = true;
+    ['g-cross', 'g-cross5', 'g-ans-hom', 'g-ans-het'].forEach((id) => { $(id).disabled = false; });
+    renderGame();
+  }
+  function cross(n) {
+    if (game.answered) return;
+    const g = gts();
+    for (let i = 0; i < n; i++) {
+      const a = game.geno[Math.floor(rand() * 2)];
+      game.kids.push(L.isDominant(L.norm(a + g[2][0])));
+    }
+    renderGame();
+  }
+  function renderGame() {
+    const k = game.kids, n = k.length, rec = k.filter((x) => !x).length;
+    $('g-kids').innerHTML = k.slice().reverse().slice(0, 40).map((d) => `<div class="kid">${icon(d, 36)}<div>${d ? T().dom : T().rec}</div></div>`).join('') || '<span style="color:var(--muted)">まだ子がいません。「交雑して子を1個体得る」を押してください。</span>';
+    let st = `得られた子: ${n}個体(${T().dom} ${n - rec} / ${T().rec} ${rec})。`;
+    if (n > 0 && rec > 0) st += `潜性の子が出たので、謎の個体は必ずヘテロ接合(${gts()[1]})です。`;
+    else if (n > 0) st += `潜性の子がまだ出ていません。もしヘテロ接合(${gts()[1]})なら、ここまで潜性が1個体も出ない確率は (1/2)^${n} = ${(L.missProbability(n) * 100).toFixed(n > 10 ? 3 : 1)}% です。`;
+    $('g-stat').textContent = st;
+  }
+  function answer(hom) {
+    if (game.answered) return;
+    if (!game.kids.length) { $('g-fb').textContent = 'まず交雑して、子を1個体以上得てからこたえましょう。'; return; }
+    game.answered = true;
+    const g = gts(), truth = game.geno, correct = (truth === g[0]) === hom;
+    score[1]++; if (correct) score[0]++;
+    $('g-score').textContent = score[0] + ' / ' + score[1];
+    const rec = game.kids.filter((x) => !x).length;
+    let msg = (correct ? '○ 正解!' : '× 不正解。') + ` 謎の個体は ${truth}(${truth[0] === truth[1] ? 'ホモ接合' : 'ヘテロ接合'})でした。`;
+    if (correct && hom && rec === 0) msg += ` (今回は${game.kids.length}個体すべて${T().dom}で当たりましたが、子が少ないとヘテロ接合でも偶然そうなることがあります。)`;
+    if (!correct && !hom) msg += ' 子の中に潜性が出ていればヘテロ接合と断定できます。';
+    if (!correct && hom && truth !== g[0]) msg += ` 子の数が少なく、偶然${T().dom}ばかりだったのかもしれません(ヘテロ接合でも確率 (1/2)^${game.kids.length} で起こります)。`;
+    $('g-fb').textContent = msg; $('g-next').hidden = false;
+    ['g-cross', 'g-cross5', 'g-ans-hom', 'g-ans-het'].forEach((id) => { $(id).disabled = true; });
+  }
+
+  /* ---- 共通 ---- */
+  function setTrait(t) {
+    trait = t;
+    $('trait-note').textContent = `${T().species}の${T().name}: 顕性(優性)=${T().dom}(遺伝子 ${T().letter})、潜性(劣性)=${T().rec}(遺伝子 ${T().letter.toLowerCase()})`;
+    renderParents(); renderPunnett(); resetSim(); newGame();
+  }
+  function setTab(n) { [1, 2, 3].forEach((k) => { $('pane-' + k).hidden = k !== n; }); }
+
+  document.querySelectorAll('input[name="trait"]').forEach((r) => r.addEventListener('change', () => setTrait(r.value)));
+  document.querySelectorAll('input[name="tab"]').forEach((r) => r.addEventListener('change', () => setTab(Number(r.value))));
+  document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => { L.simulate(gts()[i1], gts()[i2], Number(b.dataset.add), rand, trait, sim.counts); sim.n += Number(b.dataset.add); renderSim(); }));
+  $('sim-reset').addEventListener('click', resetSim);
+  $('g-cross').addEventListener('click', () => cross(1));
+  $('g-cross5').addEventListener('click', () => cross(5));
+  $('g-ans-hom').addEventListener('click', () => answer(true));
+  $('g-ans-het').addEventListener('click', () => answer(false));
+  $('g-next').addEventListener('click', newGame);
+  document.addEventListener('themechange', () => { renderPunnett(); renderSim(); renderGame(); });
+
+  setTrait('seed');
+  C.mountQuiz($('quiz'), QUIZ);
+  window.__gen = { get game() { return game; }, get sim() { return sim; } };
+})();
+
+</script>
+</body>
+</html>

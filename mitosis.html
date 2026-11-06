@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>体細胞分裂のステップ送り｜生物基礎 教材</title>
+<meta name="description" content="間期から分裂期までを1段階ずつ送り、染色体の動きとDNA量の変化を同時に確かめます。動物細胞と植物細胞の違いも比べられます。">
+<style>
+/* 共通スタイル(ビルド時に各HTMLへインライン展開される) */
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-2: #eaf0ec;
+  --text: #17211d;
+  --muted: #455650;
+  --border: #b9c5be;
+  --accent: #00695c;
+  --accent-text: #ffffff;
+  --accent-soft: #d7ede8;
+  --focus: #0050c8;
+  --ok: #0b6b2f;
+  --ok-bg: #dff3e4;
+  --ng: #a3281d;
+  --ng-bg: #fbe4e0;
+  --note-bg: #fff4d6;
+  --note-border: #8a6200;
+  /* データ用色(Okabe-Ito 系・色覚多様性に配慮。必ず形/線種/文字も併用する) */
+  --c1: #0072b2;
+  --c2: #c04a00;
+  --c3: #a8508c;
+  --c4: #007a5a;
+  --cell-fill: #e3f1e8;
+  --cell-stroke: #2f5d44;
+  --nuc-fill: #d6e6f5;
+  --chromo: #7a2e8a;
+  --grid: #c9d3cd;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #1a2320;
+    --surface-2: #243029;
+    --text: #e9f0ec;
+    --muted: #b0bfb8;
+    --border: #46544d;
+    --accent: #5cc4b0;
+    --accent-text: #06211c;
+    --accent-soft: #1f3a34;
+    --focus: #8cb8ff;
+    --ok: #7fdc9a;
+    --ok-bg: #173a24;
+    --ng: #ff9d90;
+    --ng-bg: #4a1f1a;
+    --note-bg: #3a3012;
+    --note-border: #e0b84a;
+    --c1: #5db8f0;
+    --c2: #f0a060;
+    --c3: #e0a0d0;
+    --c4: #4fd6a8;
+    --cell-fill: #24382d;
+    --cell-stroke: #8fc9a8;
+    --nuc-fill: #263a52;
+    --chromo: #d9a0e8;
+    --grid: #3a4842;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #1a2320;
+  --surface-2: #243029;
+  --text: #e9f0ec;
+  --muted: #b0bfb8;
+  --border: #46544d;
+  --accent: #5cc4b0;
+  --accent-text: #06211c;
+  --accent-soft: #1f3a34;
+  --focus: #8cb8ff;
+  --ok: #7fdc9a;
+  --ok-bg: #173a24;
+  --ng: #ff9d90;
+  --ng-bg: #4a1f1a;
+  --note-bg: #3a3012;
+  --note-border: #e0b84a;
+  --c1: #5db8f0;
+  --c2: #f0a060;
+  --c3: #e0a0d0;
+  --c4: #4fd6a8;
+  --cell-fill: #24382d;
+  --cell-stroke: #8fc9a8;
+  --nuc-fill: #263a52;
+  --chromo: #d9a0e8;
+  --grid: #3a4842;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  line-height: 1.7;
+  font-size: 16px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
+.app-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.app-header .back { font-size: 0.9rem; white-space: nowrap; }
+.app-header h1 { font-size: 1.25rem; margin: 0; flex: 1 1 220px; line-height: 1.4; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lead { color: var(--muted); margin: 16px 0; }
+.lead b { color: var(--text); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin: 14px 0; box-shadow: var(--shadow);
+}
+.panel > h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.panel > h3 { font-size: 1rem; margin: 12px 0 4px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 780px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.btn {
+  font: inherit; min-height: 44px; min-width: 44px; padding: 6px 16px; border-radius: 10px;
+  border: 2px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.btn:hover { background: var(--accent-soft); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg label {
+  min-height: 44px; display: inline-flex; align-items: center; padding: 4px 14px; cursor: pointer;
+  border: 2px solid var(--border); border-radius: 10px; background: var(--surface); gap: 6px;
+}
+.seg input:checked + label { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.seg input:checked + label::before { content: "✓"; }
+.seg input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.ctl { margin: 10px 0; }
+.ctl > label, .ctl > .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: 0.95rem; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--accent); }
+.ctl input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); margin: 2px 0; }
+.ctl .hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+.note {
+  background: var(--note-bg); border-left: 6px solid var(--note-border); border-radius: 6px;
+  padding: 8px 12px; margin: 12px 0; font-size: 0.9rem;
+}
+.note::before { content: "※ 注意:"; font-weight: 700; margin-right: 4px; }
+.note.info::before { content: "ℹ 補足:"; }
+.badge {
+  display: inline-block; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--accent);
+  background: var(--accent-soft); font-weight: 700; font-size: 0.9rem;
+}
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0; }
+.readout > div { background: var(--surface-2); border-radius: 8px; padding: 6px 10px; }
+.readout .k { font-size: 0.78rem; color: var(--muted); display: block; }
+.readout .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+svg.fig, canvas.fig { width: 100%; height: auto; display: block; max-width: 100%; }
+svg text { font-family: inherit; fill: var(--text); }
+svg .axis { stroke: var(--text); stroke-width: 1.5; fill: none; }
+svg .grid { stroke: var(--grid); stroke-width: 1; }
+svg .muted-t { fill: var(--muted); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.tbl th, table.tbl td { border: 1px solid var(--border); padding: 4px 8px; text-align: center; }
+table.tbl th { background: var(--surface-2); }
+.scroll-x { overflow-x: auto; }
+
+/* クイズ */
+.quiz .q-head { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+.quiz .q-text { font-weight: 700; font-size: 1.05rem; margin: 6px 0 10px; }
+.quiz .choices { display: grid; gap: 8px; }
+.quiz .choice {
+  font: inherit; text-align: left; min-height: 48px; padding: 8px 12px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.quiz .choice:hover:not([disabled]) { border-color: var(--accent); background: var(--accent-soft); }
+.quiz .choice .mark { min-width: 1.6em; font-weight: 700; }
+.quiz .choice.correct { border-color: var(--ok); background: var(--ok-bg); }
+.quiz .choice.wrong { border-color: var(--ng); background: var(--ng-bg); }
+.quiz .choice[disabled] { cursor: default; color: var(--text); opacity: 1; }
+.quiz .feedback { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+.quiz .feedback .verdict { font-weight: 700; }
+.quiz .feedback.ok .verdict { color: var(--ok); }
+.quiz .feedback.ng .verdict { color: var(--ng); }
+.quiz .result-score { font-size: 1.4rem; font-weight: 700; }
+.quiz ul.miss { padding-left: 1.2em; }
+
+/* 一覧ページ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.card {
+  display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px; box-shadow: var(--shadow);
+}
+.card:hover { border-color: var(--accent); }
+.card h2 { margin: 0; font-size: 1.1rem; }
+.card .icon { font-size: 2rem; line-height: 1; }
+.card .tag { font-size: 0.82rem; color: var(--muted); }
+.card .go { margin-top: auto; font-weight: 700; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+.stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.stepper button {
+  font: inherit; min-height: 44px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; padding: 2px 4px; line-height: 1.3;
+}
+.stepper button small { display: block; color: var(--muted); font-size: 0.7rem; }
+.stepper button[aria-current="step"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.stepper button[aria-current="step"]::before { content: "▶ "; }
+.legend { font-size: 0.85rem; color: var(--muted); margin: 6px 0; }
+#tbl td.cur, #tbl th.cur { background: var(--accent-soft); font-weight: 700; }
+#tbl { min-width: 560px; }
+#tbl th:first-child { white-space: nowrap; }
+
+</style>
+</head>
+<body>
+<header class="app-header">
+<a class="back" href="index.html">← 教材一覧</a>
+<h1>体細胞分裂のステップ送り</h1>
+<button id="theme-toggle" class="btn" type="button" aria-label="表示テーマの切り替え">表示切替</button>
+</header>
+<main class="wrap">
+<p class="lead"><b>ねらい:</b> 細胞が分裂する流れを1段階ずつ確かめ、<b>染色体の動き</b>と<b>細胞1個あたりのDNA量</b>の変化を結びつけて理解します。「次へ」ボタンや下の時期ボタン、キーボードの ← → キーで進められます。</p>
+
+<div class="grid-2">
+  <section class="panel" aria-labelledby="fig-h">
+    <h2 id="fig-h">細胞のようす(模式図:染色体数 2n=4)</h2>
+    <div class="seg" role="radiogroup" aria-label="細胞の種類">
+      <input type="radio" name="ctype" id="ct-animal" value="animal" checked><label for="ct-animal">動物細胞</label>
+      <input type="radio" name="ctype" id="ct-plant" value="plant"><label for="ct-plant">植物細胞</label>
+    </div>
+    <svg id="cell" class="fig" viewBox="0 0 400 300" role="img" aria-label="細胞の模式図"></svg>
+    <p class="legend" id="legend"></p>
+    <div class="btn-row">
+      <button class="btn" id="btn-prev" type="button">◀ 前へ</button>
+      <button class="btn btn-primary" id="btn-next" type="button">次へ ▶</button>
+      <button class="btn" id="btn-play" type="button" aria-pressed="false">▶ 自動再生</button>
+    </div>
+    <div class="stepper" id="stepper" role="group" aria-label="時期を選ぶ"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="info-h">
+    <h2 id="info-h">いまの時期</h2>
+    <p><span class="badge" id="phase-badge"></span></p>
+    <h3 id="stage-name" style="font-size:1.4rem;margin:4px 0"></h3>
+    <p id="stage-look"></p>
+    <ul id="stage-points"></ul>
+    <div class="readout">
+      <div><span class="k">細胞全体の染色体数</span><span class="v" id="ro-chromo"></span></div>
+      <div><span class="k">細胞1個あたりのDNA量(相対値)</span><span class="v" id="ro-dna"></span></div>
+    </div>
+  </section>
+</div>
+
+<section class="panel" aria-labelledby="graph-h">
+  <h2 id="graph-h">細胞1個あたりのDNA量の変化</h2>
+  <svg id="graph" class="fig" viewBox="0 0 440 250" role="img" aria-label="細胞周期とDNA量のグラフ"></svg>
+  <p class="note">このグラフでは見やすいように分裂期(M期)を長く描いています。実際のM期は細胞周期全体の1割ほどで、間期よりずっと短い時間です。また、細胞周期の長さは細胞の種類によって大きく異なります。</p>
+  <p class="note info">この図は理解しやすいよう簡略化した模式図です。実際の染色体はこの図のように整然とは並ばず、染色体数も生物ごとに異なります(ヒトは2n=46)。植物細胞(高等植物)には中心体がありませんが、紡錘体はつくられます。</p>
+  <div class="scroll-x">
+  <table class="tbl" id="tbl" aria-label="各時期の染色体数とDNA量の一覧"></table>
+  </div>
+</section>
+
+<section class="panel quiz" aria-labelledby="quiz-h"><h2 id="quiz-h">確認クイズ(4択)</h2><div id="quiz"></div></section>
+<p class="lead" style="font-size:0.85rem">このページは個人情報を扱わず、入力内容の保存やサーバ通信を行いません。(自動生成ファイル: 編集は <code>_src/</code> 側で行い <code>node build.mjs</code> で再生成)</p>
+</main>
+<script>
+/* 共通JS: 乱数・クイズ・テーマ切替(ビルド時に各HTMLへインライン展開される) */
+const BioCommon = (function () {
+  'use strict';
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  function shuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /** 選択肢をシャッフルし、正解位置を付け替えた問題を返す */
+  function prepareQuestion(q, rng) {
+    const order = shuffle(q.choices.map((_, i) => i), rng);
+    return {
+      q: q.q,
+      choices: order.map((i) => q.choices[i]),
+      answer: order.indexOf(q.answer),
+      explain: q.explain,
+    };
+  }
+
+  /** クイズデータの検証(エラー文字列の配列を返す。空なら正常) */
+  function validateQuiz(quiz) {
+    const errs = [];
+    if (!Array.isArray(quiz) || quiz.length < 1) return ['quiz is empty'];
+    quiz.forEach((q, n) => {
+      const p = 'Q' + (n + 1) + ': ';
+      if (!q.q || typeof q.q !== 'string') errs.push(p + 'no question text');
+      if (!Array.isArray(q.choices) || q.choices.length !== 4) errs.push(p + 'needs exactly 4 choices');
+      else if (new Set(q.choices).size !== 4) errs.push(p + 'choices must be unique');
+      if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3) errs.push(p + 'answer index out of range');
+      if (!q.explain || q.explain.length < 10) errs.push(p + 'explanation missing');
+    });
+    return errs;
+  }
+
+  /* ---------- ブラウザ専用 ---------- */
+  const LABELS = ['ア', 'イ', 'ウ', 'エ'];
+
+  function el(tag, attrs, children) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach((c) => e.appendChild(c));
+    return e;
+  }
+
+  function mountQuiz(root, quizData, opts) {
+    const errs = validateQuiz(quizData);
+    if (errs.length) { root.textContent = 'クイズデータにエラー: ' + errs.join(' / '); return; }
+    const rng = (opts && opts.rng) || Math.random;
+    let qs, idx, score, missed, answered;
+
+    function start() {
+      qs = quizData.map((q) => prepareQuestion(q, rng));
+      idx = 0; score = 0; missed = []; answered = false;
+      render();
+    }
+
+    function render() {
+      root.textContent = '';
+      if (idx >= qs.length) return renderResult();
+      const q = qs[idx];
+      const head = el('div', { class: 'q-head' }, [
+        el('span', { text: '第' + (idx + 1) + '問 / 全' + qs.length + '問' }),
+        el('span', { text: '正解 ' + score + '問' }),
+      ]);
+      const text = el('div', { class: 'q-text', id: 'qtext-' + idx, text: q.q });
+      const list = el('div', { class: 'choices', role: 'group', 'aria-labelledby': 'qtext-' + idx });
+      q.choices.forEach((c, i) => {
+        const b = el('button', { type: 'button', class: 'choice', 'data-i': String(i) }, [
+          el('span', { class: 'mark', text: LABELS[i] }),
+          el('span', { text: c }),
+        ]);
+        b.addEventListener('click', () => choose(i, list, b));
+        list.appendChild(b);
+      });
+      const fb = el('div', { 'aria-live': 'polite' });
+      root.append(head, text, list, fb);
+      answered = false;
+    }
+
+    function choose(i, list, btn) {
+      if (answered) return;
+      answered = true;
+      const q = qs[idx];
+      const ok = i === q.answer;
+      if (ok) score++; else missed.push({ q: q.q, correct: q.choices[q.answer] });
+      [...list.children].forEach((b, n) => {
+        b.disabled = true;
+        const mark = b.querySelector('.mark');
+        if (n === q.answer) { b.classList.add('correct'); mark.textContent = '○'; }
+        else if (n === i) { b.classList.add('wrong'); mark.textContent = '×'; }
+      });
+      const fb = root.querySelector('[aria-live]');
+      fb.textContent = '';
+      const box = el('div', { class: 'feedback ' + (ok ? 'ok' : 'ng') }, [
+        el('div', { class: 'verdict', text: ok ? '○ 正解です' : '× 不正解 — 正解は「' + LABELS[q.answer] + '」です' }),
+        el('div', { text: q.explain }),
+      ]);
+      const next = el('button', { type: 'button', class: 'btn btn-primary', text: idx + 1 >= qs.length ? '結果を見る' : '次の問題へ' });
+      next.addEventListener('click', () => { idx++; render(); const f = root.querySelector('.q-text,.result-score'); if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); } });
+      box.appendChild(el('div', { class: 'btn-row' }, [next]));
+      fb.appendChild(box);
+    }
+
+    function renderResult() {
+      const pct = Math.round((score / qs.length) * 100);
+      root.append(el('div', { class: 'result-score', text: qs.length + '問中 ' + score + '問 正解(' + pct + '%)' }));
+      if (missed.length === 0) {
+        root.append(el('p', { text: '全問正解です。お見事!' }));
+      } else {
+        root.append(el('p', { text: 'まちがえた問題を見直しましょう。' }));
+        const ul = el('ul', { class: 'miss' });
+        missed.forEach((m) => ul.appendChild(el('li', { text: m.q + ' → 正解: ' + m.correct })));
+        root.append(ul);
+      }
+      const again = el('button', { type: 'button', class: 'btn btn-primary', text: 'もう一度挑戦する' });
+      again.addEventListener('click', start);
+      root.append(el('div', { class: 'btn-row' }, [again]));
+    }
+    start();
+  }
+
+  /* テーマ切替(保存はしない。ページを開き直すとOS設定に戻る) */
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    function effective() {
+      const t = document.documentElement.getAttribute('data-theme');
+      return t || (mq.matches ? 'dark' : 'light');
+    }
+    function label() { btn.textContent = effective() === 'dark' ? '☀ ライト表示にする' : '☾ ダーク表示にする'; }
+    btn.addEventListener('click', () => {
+      document.documentElement.setAttribute('data-theme', effective() === 'dark' ? 'light' : 'dark');
+      label();
+      document.dispatchEvent(new Event('themechange'));
+    });
+    if (mq.addEventListener) mq.addEventListener('change', () => { label(); document.dispatchEvent(new Event('themechange')); });
+    label();
+  }
+
+  /** CSS変数の現在値を取得(canvas描画用) */
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** prefers-reduced-motion */
+  function reducedMotion() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  const api = { mulberry32, clamp, lerp, ease, shuffle, prepareQuestion, validateQuiz, mountQuiz, initTheme, cssVar, reducedMotion };
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', initTheme);
+  return api;
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = BioCommon;
+
+/* 体細胞分裂: 純粋ロジック(描画に依存しない。Nodeでテスト可能) */
+const MitosisLogic = (function () {
+  'use strict';
+  const CX = 200, CY = 150;     // 細胞の中心 (viewBox 400x300)
+  const D = 82;                 // 後期以降の染色分体の中心からの距離
+  const NUC_R = 62;             // 核の半径
+  const LEN = [46, 30, 30, 46]; // 4本の染色体(2n=4: 長い相同染色体の対と短い対)
+  const Y_META = [-68, -20, 20, 68];
+  const P_INT = [[-26, -16], [22, -26], [-18, 24], [26, 18]];
+  const ANG_INT = [55, -35, 20, 80];
+  const PHASE = [0, 1.7, 3.1, 4.4];
+
+  const KEYS = ['nuc', 'cond', 'dup', 'align', 'sep', 'vee', 'spindle', 'cent', 'dupC', 'furrow', 'gap', 'plate', 'elong', 'nucT'];
+  const BASE = { nuc: 1, cond: 0, dup: 0, align: 0, sep: 0, vee: 0, spindle: 0, cent: 0, dupC: 0, furrow: 0, gap: 0, plate: 0, elong: 0, nucT: 0 };
+  const P = (o) => Object.assign({}, BASE, o);
+
+  const STAGES = [
+    {
+      id: 'g1', short: 'G1', name: 'G1期', phase: '間期', width: 3,
+      params: P({}),
+      chromo: 4, dna: '2', dnaNum: 2,
+      look: '細い糸のように広がった染色体(染色体としては見えにくい状態)が、核膜に包まれた核の中にあります。',
+      points: ['細胞が成長し、タンパク質などをさかんに合成する時期(DNA合成の準備期)。', 'DNA量を「2」とすると、この時期の細胞は2のまま。'],
+    },
+    {
+      id: 's', short: 'S', name: 'S期', phase: '間期', width: 3,
+      params: P({ dup: 0.6, dupC: 1 }),
+      chromo: 4, dna: '2 → 4', dnaNum: 3,
+      look: 'DNAが複製され、1本ずつだった染色体が2本の染色分体(姉妹染色分体)になります。',
+      points: ['DNAを合成する時期(S = Synthesis)。DNA量が2から4へ倍加。', '染色体の「本数」は4本のまま。1本の染色体が同じ内容の2本の染色分体を含むようになるだけ。', '動物細胞では中心体もこの頃に複製される。'],
+    },
+    {
+      id: 'g2', short: 'G2', name: 'G2期', phase: '間期', width: 2,
+      params: P({ dup: 1, dupC: 1 }),
+      chromo: 4, dna: '4', dnaNum: 4,
+      look: '複製を終えた染色体(各2本の染色分体)が、まだ核の中に広がっています。',
+      points: ['分裂の準備期。紡錘体の材料となるタンパク質などを合成する。', 'DNA量は4。ここまでが間期(G1期→S期→G2期)。'],
+    },
+    {
+      id: 'pro', short: '前', name: '前期', phase: '分裂期(M期)', width: 1.4,
+      params: P({ nuc: 0.3, cond: 1, dup: 1, spindle: 0.6, cent: 1, dupC: 1 }),
+      chromo: 4, dna: '4', dnaNum: 4,
+      look: '染色体が凝縮して太く短くなり、光学顕微鏡で見えるようになります。核膜は消えはじめ(点線)、紡錘体ができはじめます。',
+      points: ['ここから分裂期(M期)。染色体が太く短くなり、2本の染色分体が見えるようになる。', '核膜と核小体が消えていく。', '動物細胞では中心体が両極に移動し、そこから紡錘糸がのびる。'],
+    },
+    {
+      id: 'meta', short: '中', name: '中期', phase: '分裂期(M期)', width: 0.9,
+      params: P({ nuc: 0, cond: 1, dup: 1, align: 1, spindle: 1, cent: 1, dupC: 1 }),
+      chromo: 4, dna: '4', dnaNum: 4,
+      look: '染色体が細胞の中央(赤道面)に並びます。各染色体の動原体に、両極からの紡錘糸が付いています。',
+      points: ['染色体がもっとも太く短くなり、赤道面に並ぶ。', '染色体の数や形を観察するのに適した時期。'],
+    },
+    {
+      id: 'ana', short: '後', name: '後期', phase: '分裂期(M期)', width: 0.9,
+      params: P({ nuc: 0, cond: 1, dup: 1, align: 1, sep: 1, vee: 1, spindle: 1, cent: 1, dupC: 1, elong: 1 }),
+      chromo: 8, dna: '4', dnaNum: 4,
+      look: '各染色体が染色分体に分かれ、紡錘糸に引かれて両極へ移動します。細胞全体の染色体数は一時的に2倍(8本)に数えられます。',
+      points: ['染色分体が分離して、それぞれが1本の染色体になる。', '染色体は動原体側が先に引かれるため、V字形に見える。', '細胞全体のDNA量は4のまま(まだ1個の細胞)。'],
+    },
+    {
+      id: 'telo', short: '終', name: '終期', phase: '分裂期(M期)', width: 1.4,
+      params: P({ nuc: 0, cond: 0.4, dup: 0, align: 0.4, sep: 1, spindle: 0, cent: 1, dupC: 1, furrow: 1, plate: 1, elong: 1, nucT: 1 }),
+      chromo: 8, dna: '4 → 2', dnaNum: 3,
+      look: '両極に集まった染色体がほどけはじめ、それぞれの極で核膜が再びできます。細胞質が2つに分かれます(細胞質分裂)。',
+      points: ['染色体がほどけ、核膜・核小体が再形成される。紡錘体は消える。', '動物細胞は細胞膜がくびれて2つに分かれ、植物細胞は中央に細胞板ができて新しい細胞壁になる。', '細胞が2つに分かれることで、細胞1個あたりのDNA量は4から2に戻る。'],
+    },
+    {
+      id: 'g1b', short: 'G1', name: '娘細胞(次のG1期)', phase: '間期へ', width: 2.4,
+      params: P({ nucT: 1, nuc: 0, elong: 1, sep: 1, furrow: 1, gap: 1, plate: 1, cent: 1, dupC: 1 }),
+      chromo: 4, dna: '2', dnaNum: 2,
+      look: '同じ遺伝情報をもつ2個の娘細胞ができました。それぞれの核の中で染色体は再び細い糸状に広がります。',
+      points: ['娘細胞の染色体数は母細胞と同じ(ここでは4本)、DNA量は2。', '体細胞分裂では遺伝情報が同じ細胞が2個できる。', '娘細胞は成長してまた分裂することができる(細胞周期)。'],
+    },
+  ];
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function blend(a, b, t) {
+    const o = {};
+    KEYS.forEach((k) => { o[k] = lerp(a[k], b[k], t); });
+    return o;
+  }
+  /** 連続的なステップ位置 t (0〜7) のパラメータ */
+  function paramsAt(t) {
+    const tt = Math.min(STAGES.length - 1, Math.max(0, t));
+    const i = Math.min(STAGES.length - 2, Math.floor(tt));
+    return blend(STAGES[i].params, STAGES[i + 1].params, tt - i);
+  }
+
+  /* ----- DNA量グラフ ----- */
+  const TOTAL_W = STAGES.reduce((s, x) => s + x.width, 0);
+  const EDGES = (() => { const e = [0]; STAGES.forEach((s) => e.push(e[e.length - 1] + s.width / TOTAL_W)); return e; })();
+  const CENTERS = STAGES.map((s, i) => (EDGES[i] + EDGES[i + 1]) / 2);
+  // 区間端の頂点 (x:0〜1, DNA相対量)
+  const DNA_VERTS = [[EDGES[0], 2], [EDGES[1], 2], [EDGES[2], 4], [EDGES[3], 4], [EDGES[4], 4], [EDGES[5], 4], [EDGES[6], 4], [EDGES[7], 2], [EDGES[8], 2]];
+  function dnaAtX(x) {
+    for (let i = 0; i < DNA_VERTS.length - 1; i++) {
+      const [x0, y0] = DNA_VERTS[i], [x1, y1] = DNA_VERTS[i + 1];
+      if (x >= x0 && x <= x1) return x1 === x0 ? y1 : lerp(y0, y1, (x - x0) / (x1 - x0));
+    }
+    return x < 0 ? DNA_VERTS[0][1] : DNA_VERTS[DNA_VERTS.length - 1][1];
+  }
+  /** ステップ位置tでの印の位置 {x:0〜1, y:DNA量} */
+  function markerAt(t) {
+    const tt = Math.min(STAGES.length - 1, Math.max(0, t));
+    const i = Math.min(STAGES.length - 2, Math.floor(tt));
+    const x = lerp(CENTERS[i], CENTERS[i + 1], tt - i);
+    return { x, y: dnaAtX(x) };
+  }
+
+  /* ----- 形状 ----- */
+  /** 染色分体の折れ線(世界座標)。返り値: [{pts, cx, cy, width, cond, idx, side}] */
+  function chromatids(p) {
+    const out = [];
+    for (let i = 0; i < 4; i++) {
+      const base = [CX + lerp(P_INT[i][0], 0, p.align), CY + lerp(P_INT[i][1], Y_META[i], p.align)];
+      const ang = lerp(ANG_INT[i], 0, p.align) * Math.PI / 180;
+      const ca = Math.cos(ang), sa = Math.sin(ang);
+      const sides = (p.dup > 0.001 || p.sep > 0.001) ? [-1, 1] : [-1];
+      sides.forEach((side) => {
+        const len = LEN[i] * lerp(1.3, 1, p.cond);
+        const amp = (1 - p.cond) * 7;
+        const pts = [];
+        const N = 14;
+        for (let n = 0; n <= N; n++) {
+          const u = n / N - 0.5;
+          const xl = amp * Math.sin(u * Math.PI * 2 * 2.2 + PHASE[i]) - side * p.vee * 10 * (2 * Math.abs(u));
+          const yl = u * len;
+          pts.push([xl * ca - yl * sa, xl * sa + yl * ca]);
+        }
+        // 姉妹染色分体の間隔(染色体の軸に垂直)と、後期の分離距離(x方向)
+        const off = side * 3.5 * p.dup;
+        const ox = base[0] + off * ca + side * p.sep * D;
+        const oy = base[1] + off * sa;
+        out.push({
+          idx: i, side, cx: ox, cy: oy, width: lerp(2.4, 8, p.cond), cond: p.cond,
+          pts: pts.map(([x, y]) => [ox + x, oy + y]),
+        });
+      });
+    }
+    return out;
+  }
+
+  /** 中心体/紡錘極の位置 */
+  function poles(p) {
+    const px = lerp(6 * p.dupC, 128, p.cent);
+    const py = lerp(70, CY, p.cent) - 70 * p.nucT; // 終期以降は核の外(上)に置く
+    return [[CX - px, py], [CX + px, py]];
+  }
+
+  function cellGeom(p, animal) {
+    if (!animal) return { R: 165, ry: 102 };
+    return { R: lerp(150, 165, p.elong), ry: lerp(110, 104, p.elong) };
+  }
+  /** 動物細胞の輪郭(くびれ・分離つき)。pathのd文字列の配列 */
+  function animalOutline(p) {
+    const { R, ry } = cellGeom(p, true);
+    const half = (x) => ry * Math.sqrt(Math.max(0, 1 - (x / R) * (x / R))) * (1 - p.furrow * Math.exp(-Math.pow(x / 38, 2)));
+    const f = (n) => n.toFixed(1);
+    const N = 48;
+    const xs = (a, b) => Array.from({ length: N + 1 }, (_, k) => lerp(a, b, k / N));
+    function poly(x0, x1, shift) {
+      const X = xs(x0, x1);
+      const top = X.map((x) => `${f(CX + x + shift)},${f(CY - half(x))}`);
+      const bot = X.slice().reverse().map((x) => `${f(CX + x + shift)},${f(CY + half(x))}`);
+      return 'M' + top.join('L') + 'L' + bot.join('L') + 'Z';
+    }
+    if (p.gap < 0.001) return [poly(-R, R, 0)];
+    const g = p.gap * 10;
+    return [poly(-R, 0, -g), poly(0, R, g)];
+  }
+  /** 点が細胞の内側か(テスト用の簡易判定) */
+  function insideCell(x, y, p, animal) {
+    const { R, ry } = cellGeom(p, animal);
+    if (!animal) return Math.abs(x - CX) <= R && Math.abs(y - CY) <= ry;
+    const dx = (x - CX) / (R + p.gap * 10);
+    return Math.abs(dx) <= 1 && Math.abs(y - CY) <= ry * Math.sqrt(Math.max(0, 1 - Math.pow(Math.min(1, Math.abs(dx)), 2))) + 1e-6;
+  }
+
+  return { CX, CY, D, NUC_R, KEYS, STAGES, paramsAt, blend, EDGES, CENTERS, DNA_VERTS, dnaAtX, markerAt, chromatids, poles, cellGeom, animalOutline, insideCell };
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = MitosisLogic;
+
+const QUIZ = [
+  { q: '体細胞分裂の間期で、DNAが複製(合成)されるのはどの時期ですか。', choices: ['G1期', 'S期', 'G2期', '前期'], answer: 1,
+    explain: 'DNAを合成する時期なのでS期(Synthesis)です。S期にDNA量が2倍になります。' },
+  { q: '染色体が細胞の中央(赤道面)に並ぶのはどの時期ですか。', choices: ['前期', '中期', '後期', '終期'], answer: 1,
+    explain: '赤道面に並ぶのが中期です。染色体がもっとも太く短く、数や形を観察しやすい時期でもあります。' },
+  { q: '染色体数が2n=4の体細胞が分裂するとき、後期の細胞1個全体にある染色体は何本と数えられますか。', choices: ['2本', '4本', '8本', '16本'], answer: 2,
+    explain: '後期には染色分体が分離し、それぞれが1本の染色体になるので、細胞全体では一時的に2倍の8本になります。終期に2つの細胞へ分かれると、各細胞は4本に戻ります。' },
+  { q: '細胞1個あたりのDNA量を、G1期を「2」としたとき、G2期の細胞のDNA量はいくつですか。', choices: ['1', '2', '4', '8'], answer: 2,
+    explain: 'S期にDNAが複製されて2から4になり、G2期はそのまま4です。' },
+  { q: '分裂が完了した直後の娘細胞1個のDNA量は、G1期を「2」とするといくつですか。', choices: ['1', '2', '4', '8'], answer: 1,
+    explain: '細胞質分裂で細胞が2つに分かれるため、細胞1個あたりのDNA量は4から2に戻ります。' },
+  { q: '次のうち、細胞周期の「間期」に含まれないものはどれですか。', choices: ['G1期', 'S期', 'G2期', '前期'], answer: 3,
+    explain: '間期はG1期・S期・G2期です。前期・中期・後期・終期は分裂期(M期)に含まれます。' },
+  { q: '動物細胞と植物細胞の細胞質分裂の違いとして正しいものはどれですか。', choices: ['動物細胞は細胞板ができ、植物細胞は細胞膜がくびれる', '動物細胞は細胞膜がくびれ、植物細胞は細胞板ができる', 'どちらも細胞板ができる', 'どちらも細胞膜がくびれる'], answer: 1,
+    explain: '動物細胞は細胞膜が内側へくびれて2つに分かれます。植物細胞は細胞壁があるため、中央に細胞板ができて新しい細胞壁になります。' },
+  { q: '紡錘糸が結合する染色体の部分はどこですか。', choices: ['核小体', '動原体', 'ミトコンドリア', 'リボソーム'], answer: 1,
+    explain: '紡錘糸は染色体のくびれた部分にある動原体に結合し、染色体(染色分体)を両極へ引っぱります。' },
+  { q: '体細胞分裂によってできた2個の娘細胞について正しいものはどれですか。', choices: ['染色体数が母細胞の半分になる', '母細胞と同じ遺伝情報をもつ', '2個の娘細胞で遺伝情報が異なる', 'DNA量が母細胞(G2期)の2倍になる'], answer: 1,
+    explain: '複製されたDNAが均等に分配されるため、娘細胞の染色体数・遺伝情報は母細胞と同じです。染色体数が半分になるのは減数分裂のときです。' },
+];
+
+(function () {
+  'use strict';
+  const L = MitosisLogic, C = BioCommon;
+  const $ = (id) => document.getElementById(id);
+  const svg = $('cell'), graph = $('graph');
+  const last = L.STAGES.length - 1;
+  let step = 0, animal = true, playing = false, timer = null;
+  let cur = L.paramsAt(0), from = cur, to = cur, t0 = 0, dur = 0, raf = 0;
+
+  function cellSvg(p) {
+    const f = (n) => n.toFixed(1);
+    let s = '';
+    if (animal) {
+      L.animalOutline(p).forEach((d) => { s += `<path d="${d}" fill="var(--cell-fill)" stroke="var(--cell-stroke)" stroke-width="3" stroke-linejoin="round"/>`; });
+    } else {
+      s += `<rect x="35" y="48" width="330" height="204" rx="16" fill="var(--cell-fill)" stroke="var(--cell-stroke)" stroke-width="7"/>`;
+      if (p.plate > 0.001) {
+        const h = 102 * p.plate;
+        s += `<line x1="200" y1="${f(150 - h)}" x2="200" y2="${f(150 + h)}" stroke="var(--cell-stroke)" stroke-width="7" stroke-dasharray="${p.plate < 0.999 ? '6 4' : 'none'}"/>`;
+      }
+    }
+    // 核(間期)と娘核
+    if (p.nuc > 0.01) {
+      const dashed = p.nuc < 0.99 ? ' stroke-dasharray="5 4"' : '';
+      s += `<circle cx="200" cy="150" r="${L.NUC_R}" fill="var(--nuc-fill)" fill-opacity="${f(p.nuc)}" stroke="var(--text)" stroke-opacity="${f(Math.max(p.nuc, 0.25))}" stroke-width="2"${dashed}/>`;
+      if (p.nuc > 0.5 && p.cond < 0.2) s += `<circle cx="214" cy="164" r="8" fill="var(--text)" fill-opacity="${f((p.nuc - 0.5) * 1.2)}"/>`;
+    }
+    if (p.nucT > 0.01) {
+      [-1, 1].forEach((sd) => {
+        s += `<circle cx="${200 + sd * L.D}" cy="150" r="${L.NUC_R}" fill="var(--nuc-fill)" fill-opacity="${f(p.nucT * 0.85)}" stroke="var(--text)" stroke-opacity="${f(p.nucT)}" stroke-width="2"/>`;
+      });
+    }
+    // 紡錘糸
+    const chs = L.chromatids(p);
+    const poles = L.poles(p);
+    if (p.spindle > 0.01) {
+      chs.forEach((c) => {
+        const pole = poles[c.side < 0 ? 0 : 1];
+        s += `<line x1="${f(pole[0])}" y1="${f(pole[1])}" x2="${f(c.cx)}" y2="${f(c.cy)}" stroke="var(--muted)" stroke-width="1.3" stroke-dasharray="4 3" stroke-opacity="${f(p.spindle)}"/>`;
+      });
+    }
+    // 染色体(背景色の縁取り→本体)
+    chs.forEach((c) => {
+      const d = 'M' + c.pts.map((q) => f(q[0]) + ',' + f(q[1])).join('L');
+      s += `<path d="${d}" fill="none" stroke="var(--cell-fill)" stroke-opacity="0.9" stroke-width="${f(c.width + 3)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      s += `<path d="${d}" fill="none" stroke="var(--chromo)" stroke-width="${f(c.width)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      if (p.cond > 0.5) s += `<circle cx="${f(c.cx)}" cy="${f(c.cy)}" r="${f(1.2 + p.cond * 1.6)}" fill="var(--cell-fill)" stroke="var(--text)" stroke-width="1" stroke-opacity="${f((p.cond - 0.5) * 2)}"/>`;
+    });
+    // 中心体(動物細胞のみ)
+    if (animal) {
+      poles.forEach((q, i) => {
+        if (i === 1 && p.dupC < 0.01) return;
+        s += `<g transform="translate(${f(q[0])},${f(q[1])})" stroke="var(--text)" stroke-width="2" stroke-linecap="round"><line x1="-6" y1="0" x2="6" y2="0"/><line x1="0" y1="-6" x2="0" y2="6"/><line x1="-4" y1="-4" x2="4" y2="4"/><line x1="-4" y1="4" x2="4" y2="-4"/></g>`;
+      });
+    }
+    // 赤道面の目印(中期)
+    if (step === 4) s += `<text x="206" y="30" font-size="14" class="muted-t">赤道面</text><line x1="200" y1="34" x2="200" y2="38" stroke="var(--muted)" stroke-width="1.5"/>`;
+    return s;
+  }
+
+  function graphSvg(tcur) {
+    const X0 = 44, X1 = 428, W = X1 - X0, Y0 = 190, Y1 = 28;       // Y0: DNA=0, Y1: DNA=5
+    const px = (x) => X0 + x * W, py = (v) => Y0 - (v / 5) * (Y0 - Y1);
+    let s = '';
+    // 帯(時期)
+    L.STAGES.forEach((st, i) => {
+      const x = px(L.EDGES[i]), w = px(L.EDGES[i + 1]) - x;
+      s += `<rect x="${x.toFixed(1)}" y="${Y1 - 6}" width="${w.toFixed(1)}" height="${Y0 - Y1 + 6}" fill="${i % 2 ? 'var(--surface-2)' : 'var(--surface)'}"${i === Math.round(tcur) ? ' stroke="var(--accent)" stroke-width="2"' : ''}/>`;
+      s += `<text x="${(x + w / 2).toFixed(1)}" y="${Y0 + 16}" font-size="14" text-anchor="middle">${st.short}</text>`;
+    });
+    // 目盛り
+    [0, 2, 4].forEach((v) => { s += `<line class="grid" x1="${X0}" x2="${X1}" y1="${py(v)}" y2="${py(v)}"/><text x="${X0 - 6}" y="${py(v) + 4}" font-size="14" text-anchor="end">${v}</text>`; });
+    s += `<line class="axis" x1="${X0}" y1="${Y1 - 6}" x2="${X0}" y2="${Y0}"/><line class="axis" x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}"/>`;
+    s += `<text x="12" y="${(Y0 + Y1) / 2}" font-size="14" text-anchor="middle" transform="rotate(-90 12 ${(Y0 + Y1) / 2})">DNA量(相対値)</text>`;
+    // 括弧: 間期 / 分裂期
+    const bx = (a, b, label, y) => `<line class="axis" x1="${px(a) + 2}" x2="${px(b) - 2}" y1="${y}" y2="${y}"/><text x="${(px(a) + px(b)) / 2}" y="${y + 15}" font-size="14" text-anchor="middle">${label}</text>`;
+    s += bx(L.EDGES[0], L.EDGES[3], '間期', Y0 + 24) + bx(L.EDGES[3], L.EDGES[7], '分裂期(M期)', Y0 + 24);
+    // 曲線
+    const pts = L.DNA_VERTS.map((v) => px(v[0]).toFixed(1) + ',' + py(v[1]).toFixed(1)).join(' ');
+    s += `<polyline points="${pts}" fill="none" stroke="var(--c1)" stroke-width="3.5" stroke-linejoin="round"/>`;
+    // いまの位置(◆+文字)
+    const m = L.markerAt(tcur);
+    const mx = px(m.x), my = py(m.y);
+    s += `<g transform="translate(${mx.toFixed(1)},${my.toFixed(1)})"><rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" fill="var(--c2)" stroke="var(--text)" stroke-width="2"/></g>`;
+    s += `<text x="${Math.min(Math.max(mx, 70), X1 - 40).toFixed(1)}" y="${(my - 16).toFixed(1)}" font-size="14" font-weight="700" text-anchor="middle">◆ いまここ</text>`;
+    return s;
+  }
+
+  function draw() {
+    svg.innerHTML = cellSvg(cur);
+    graph.innerHTML = graphSvg(tNow());
+  }
+  let tFrom = 0, tTo = 0;
+  function tNow() { return dur > 0 ? tFrom + (tTo - tFrom) * Math.min(1, (performance.now() - t0) / dur) : tTo; }
+
+  function frame(now) {
+    const k = dur > 0 ? Math.min(1, (now - t0) / dur) : 1;
+    cur = L.blend(from, to, C.ease(k));
+    graph.innerHTML = graphSvg(tFrom + (tTo - tFrom) * C.ease(k));
+    svg.innerHTML = cellSvg(cur);
+    raf = k < 1 ? requestAnimationFrame(frame) : 0;
+  }
+
+  function go(i, instant) {
+    i = Math.max(0, Math.min(last, i));
+    const s = L.STAGES[i];
+    from = cur; to = s.params; tFrom = tTo; tTo = i;
+    dur = (instant || C.reducedMotion()) ? 0 : 1000;
+    t0 = performance.now();
+    step = i;
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(frame);
+    updateInfo();
+  }
+
+  function updateInfo() {
+    const s = L.STAGES[step];
+    $('phase-badge').textContent = s.phase;
+    $('stage-name').textContent = s.name;
+    $('stage-look').textContent = s.look + (animal ? '' : '(植物細胞)');
+    $('stage-points').innerHTML = s.points.map((t) => `<li>${t}</li>`).join('');
+    $('ro-chromo').textContent = (step === 7 ? '4本ずつ(2個の細胞)' : step === 6 ? '8本 → 4本ずつ' : s.chromo + '本');
+    $('ro-dna').textContent = step === 7 ? '2(各細胞)' : s.dna;
+    svg.setAttribute('aria-label', `細胞の模式図(${animal ? '動物' : '植物'}細胞): ${s.name}。${s.look}`);
+    $('btn-prev').disabled = step === 0;
+    $('btn-next').disabled = step === last;
+    [...$('stepper').children].forEach((b, i) => { if (i === step) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    [...document.querySelectorAll('#tbl td, #tbl th')].forEach((c) => c.classList.toggle('cur', Number(c.dataset.col) === step));
+    $('legend').textContent = animal
+      ? '凡例: 紫の太い線=染色体 / 点線=紡錘糸 / 円=核(点線の円は核膜が分解中) / ✱=中心体'
+      : '凡例: 紫の太い線=染色体 / 点線=紡錘糸 / 円=核(点線の円は核膜が分解中) / 外側の太い枠=細胞壁';
+  }
+
+  function buildStatic() {
+    $('stepper').innerHTML = L.STAGES.map((s, i) => `<button type="button" data-i="${i}">${s.short === 'G1' && i === 7 ? 'G1<small>娘細胞</small>' : s.name.replace('(次のG1期)', '')}${i < 3 || i === 7 ? '' : '<small>M期</small>'}</button>`).join('');
+    [...$('stepper').children].forEach((b) => b.addEventListener('click', () => { stop(); go(Number(b.dataset.i)); }));
+    let h = '<tr><th>時期</th>' + L.STAGES.map((s, i) => `<th data-col="${i}">${s.short}${i > 2 && i < 7 ? '期' : ''}</th>`).join('') + '</tr>';
+    h += '<tr><th>染色体数<br>(細胞全体)</th>' + L.STAGES.map((s, i) => `<td data-col="${i}">${i === 7 ? '4×2' : s.chromo}</td>`).join('') + '</tr>';
+    h += '<tr><th>DNA量<br>(細胞1個)</th>' + L.STAGES.map((s, i) => `<td data-col="${i}">${s.dna}</td>`).join('') + '</tr>';
+    $('tbl').innerHTML = h;
+  }
+
+  function stop() { playing = false; clearInterval(timer); $('btn-play').textContent = '▶ 自動再生'; $('btn-play').setAttribute('aria-pressed', 'false'); }
+  function play() {
+    if (step >= last) go(0, true);
+    playing = true; $('btn-play').textContent = '⏸ 一時停止'; $('btn-play').setAttribute('aria-pressed', 'true');
+    clearInterval(timer);
+    timer = setInterval(() => { if (step >= last) { stop(); return; } go(step + 1); }, 2800);
+  }
+
+  $('btn-next').addEventListener('click', () => { stop(); go(step + 1); });
+  $('btn-prev').addEventListener('click', () => { stop(); go(step - 1); });
+  $('btn-play').addEventListener('click', () => (playing ? stop() : play()));
+  document.querySelectorAll('input[name="ctype"]').forEach((r) => r.addEventListener('change', () => { animal = r.value === 'animal'; updateInfo(); draw(); }));
+  document.addEventListener('keydown', (e) => {
+    if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight') { stop(); go(step + 1); }
+    if (e.key === 'ArrowLeft') { stop(); go(step - 1); }
+  });
+  document.addEventListener('themechange', draw);
+
+  buildStatic();
+  updateInfo();
+  draw();
+  BioCommon.mountQuiz($('quiz'), QUIZ);
+  window.__mitosis = { go: (i) => go(i, true), get step() { return step; } };
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNAからタンパク質へ(転写・翻訳)｜生物基礎 教材</title>
+<meta name="description" content="DNAの塩基配列からmRNA、アミノ酸への流れを1文字ずつたどります。塩基の置換や挿入・欠失(突然変異)の影響や、鎌状赤血球貧血の例、塩基の割合(シャルガフの規則)の演習もできます。">
+<style>
+/* 共通スタイル(ビルド時に各HTMLへインライン展開される) */
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-2: #eaf0ec;
+  --text: #17211d;
+  --muted: #455650;
+  --border: #b9c5be;
+  --accent: #00695c;
+  --accent-text: #ffffff;
+  --accent-soft: #d7ede8;
+  --focus: #0050c8;
+  --ok: #0b6b2f;
+  --ok-bg: #dff3e4;
+  --ng: #a3281d;
+  --ng-bg: #fbe4e0;
+  --note-bg: #fff4d6;
+  --note-border: #8a6200;
+  /* データ用色(Okabe-Ito 系・色覚多様性に配慮。必ず形/線種/文字も併用する) */
+  --c1: #0072b2;
+  --c2: #c04a00;
+  --c3: #a8508c;
+  --c4: #007a5a;
+  --cell-fill: #e3f1e8;
+  --cell-stroke: #2f5d44;
+  --nuc-fill: #d6e6f5;
+  --chromo: #7a2e8a;
+  --grid: #c9d3cd;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #1a2320;
+    --surface-2: #243029;
+    --text: #e9f0ec;
+    --muted: #b0bfb8;
+    --border: #46544d;
+    --accent: #5cc4b0;
+    --accent-text: #06211c;
+    --accent-soft: #1f3a34;
+    --focus: #8cb8ff;
+    --ok: #7fdc9a;
+    --ok-bg: #173a24;
+    --ng: #ff9d90;
+    --ng-bg: #4a1f1a;
+    --note-bg: #3a3012;
+    --note-border: #e0b84a;
+    --c1: #5db8f0;
+    --c2: #f0a060;
+    --c3: #e0a0d0;
+    --c4: #4fd6a8;
+    --cell-fill: #24382d;
+    --cell-stroke: #8fc9a8;
+    --nuc-fill: #263a52;
+    --chromo: #d9a0e8;
+    --grid: #3a4842;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #1a2320;
+  --surface-2: #243029;
+  --text: #e9f0ec;
+  --muted: #b0bfb8;
+  --border: #46544d;
+  --accent: #5cc4b0;
+  --accent-text: #06211c;
+  --accent-soft: #1f3a34;
+  --focus: #8cb8ff;
+  --ok: #7fdc9a;
+  --ok-bg: #173a24;
+  --ng: #ff9d90;
+  --ng-bg: #4a1f1a;
+  --note-bg: #3a3012;
+  --note-border: #e0b84a;
+  --c1: #5db8f0;
+  --c2: #f0a060;
+  --c3: #e0a0d0;
+  --c4: #4fd6a8;
+  --cell-fill: #24382d;
+  --cell-stroke: #8fc9a8;
+  --nuc-fill: #263a52;
+  --chromo: #d9a0e8;
+  --grid: #3a4842;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  line-height: 1.7;
+  font-size: 16px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
+.app-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.app-header .back { font-size: 0.9rem; white-space: nowrap; }
+.app-header h1 { font-size: 1.25rem; margin: 0; flex: 1 1 220px; line-height: 1.4; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lead { color: var(--muted); margin: 16px 0; }
+.lead b { color: var(--text); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; margin: 14px 0; box-shadow: var(--shadow);
+}
+.panel > h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.panel > h3 { font-size: 1rem; margin: 12px 0 4px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 780px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+
+.btn {
+  font: inherit; min-height: 44px; min-width: 44px; padding: 6px 16px; border-radius: 10px;
+  border: 2px solid var(--accent); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.btn:hover { background: var(--accent-soft); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.btn-primary:hover { background: var(--accent); filter: brightness(1.08); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg label {
+  min-height: 44px; display: inline-flex; align-items: center; padding: 4px 14px; cursor: pointer;
+  border: 2px solid var(--border); border-radius: 10px; background: var(--surface); gap: 6px;
+}
+.seg input:checked + label { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.seg input:checked + label::before { content: "✓"; }
+.seg input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.ctl { margin: 10px 0; }
+.ctl > label, .ctl > .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: 0.95rem; }
+.ctl output { font-variant-numeric: tabular-nums; color: var(--accent); }
+.ctl input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); margin: 2px 0; }
+.ctl .hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+.note {
+  background: var(--note-bg); border-left: 6px solid var(--note-border); border-radius: 6px;
+  padding: 8px 12px; margin: 12px 0; font-size: 0.9rem;
+}
+.note::before { content: "※ 注意:"; font-weight: 700; margin-right: 4px; }
+.note.info::before { content: "ℹ 補足:"; }
+.badge {
+  display: inline-block; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--accent);
+  background: var(--accent-soft); font-weight: 700; font-size: 0.9rem;
+}
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 8px 0; }
+.readout > div { background: var(--surface-2); border-radius: 8px; padding: 6px 10px; }
+.readout .k { font-size: 0.78rem; color: var(--muted); display: block; }
+.readout .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+svg.fig, canvas.fig { width: 100%; height: auto; display: block; max-width: 100%; }
+svg text { font-family: inherit; fill: var(--text); }
+svg .axis { stroke: var(--text); stroke-width: 1.5; fill: none; }
+svg .grid { stroke: var(--grid); stroke-width: 1; }
+svg .muted-t { fill: var(--muted); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.tbl th, table.tbl td { border: 1px solid var(--border); padding: 4px 8px; text-align: center; }
+table.tbl th { background: var(--surface-2); }
+.scroll-x { overflow-x: auto; }
+
+/* クイズ */
+.quiz .q-head { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.9rem; }
+.quiz .q-text { font-weight: 700; font-size: 1.05rem; margin: 6px 0 10px; }
+.quiz .choices { display: grid; gap: 8px; }
+.quiz .choice {
+  font: inherit; text-align: left; min-height: 48px; padding: 8px 12px; border-radius: 10px;
+  border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.quiz .choice:hover:not([disabled]) { border-color: var(--accent); background: var(--accent-soft); }
+.quiz .choice .mark { min-width: 1.6em; font-weight: 700; }
+.quiz .choice.correct { border-color: var(--ok); background: var(--ok-bg); }
+.quiz .choice.wrong { border-color: var(--ng); background: var(--ng-bg); }
+.quiz .choice[disabled] { cursor: default; color: var(--text); opacity: 1; }
+.quiz .feedback { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+.quiz .feedback .verdict { font-weight: 700; }
+.quiz .feedback.ok .verdict { color: var(--ok); }
+.quiz .feedback.ng .verdict { color: var(--ng); }
+.quiz .result-score { font-size: 1.4rem; font-weight: 700; }
+.quiz ul.miss { padding-left: 1.2em; }
+
+/* 一覧ページ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.card {
+  display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px; box-shadow: var(--shadow);
+}
+.card:hover { border-color: var(--accent); }
+.card h2 { margin: 0; font-size: 1.1rem; }
+.card .icon { font-size: 2rem; line-height: 1; }
+.card .tag { font-size: 0.82rem; color: var(--muted); }
+.card .go { margin-top: auto; font-weight: 700; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+.strip-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.strip { display: flex; min-width: min-content; }
+.strip .lab { position: sticky; left: 0; z-index: 2; background: var(--surface-2); border-right: 2px solid var(--border); display: grid; grid-template-rows: 44px 44px 44px 64px; min-width: 96px; font-size: 0.78rem; font-weight: 700; }
+.strip .lab div { display: flex; align-items: center; padding: 0 6px; border-bottom: 1px solid var(--border); }
+.strip .blk { display: grid; grid-template-rows: 44px 44px 44px 64px; border-right: 2px dashed var(--border); padding: 0 4px; text-align: center; min-width: 78px; }
+.strip .blk.pre { opacity: 0.55; }
+.strip .row3 { display: flex; justify-content: center; align-items: center; gap: 2px; border-bottom: 1px solid var(--border); }
+.strip .b { width: 22px; height: 34px; line-height: 34px; font: 700 1.05rem monospace; border-radius: 6px; border: 2px solid var(--border); background: var(--surface); color: var(--text); padding: 0; text-align: center; }
+button.b { cursor: pointer; }
+button.b[aria-pressed="true"] { border-color: var(--focus); background: var(--accent-soft); outline: 3px solid var(--focus); }
+.b.A { border-radius: 50%; } .b.T { border-radius: 2px; } .b.U { border-radius: 2px; border-style: dashed; } .b.G { border-radius: 10px 2px 10px 2px; } .b.C { border-radius: 2px 10px 2px 10px; }
+.b.mut { background: var(--note-bg); border-color: var(--note-border); }
+.strip .aa { display: flex; flex-direction: column; justify-content: center; line-height: 1.2; padding: 2px; }
+.strip .aa b { font-size: 1rem; } .strip .aa small { font-size: 0.68rem; color: var(--muted); }
+.strip .aa.stop { background: var(--ng-bg); } .strip .aa.start { background: var(--ok-bg); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 10px; align-items: center; }
+.chip { border: 2px solid var(--border); border-radius: 8px; padding: 2px 8px; font-weight: 700; background: var(--surface); }
+.chip.diff { border-color: var(--ng); background: var(--ng-bg); text-decoration: underline wavy; }
+.chip.stop { border-style: dashed; }
+.legend-row { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.86rem; color: var(--muted); margin: 6px 0; }
+#codon-table td, #codon-table th { font-size: 0.82rem; padding: 3px 5px; }
+#codon-table td.stopc { background: var(--ng-bg); }
+#flow-msg, #cmp-note { overflow-wrap: anywhere; }
+
+</style>
+</head>
+<body>
+<header class="app-header">
+<a class="back" href="index.html">← 教材一覧</a>
+<h1>DNAからタンパク質へ(転写・翻訳)</h1>
+<button id="theme-toggle" class="btn" type="button" aria-label="表示テーマの切り替え">表示切替</button>
+</header>
+<main class="wrap">
+<p class="lead"><b>ねらい:</b> DNAの塩基配列が、<b>転写</b>でmRNAに、<b>翻訳</b>でアミノ酸の並び(タンパク質)に写される流れを1文字ずつたどります。塩基を変えて<b>突然変異</b>の影響も調べましょう。</p>
+
+<section class="panel" aria-labelledby="in-h">
+  <h2 id="in-h">① DNAの配列(転写の鋳型になる鎖)を用意する</h2>
+  <div class="btn-row">
+    <button class="btn" type="button" id="pre-sickle">例: ヘモグロビンの遺伝子(鎌状赤血球貧血)</button>
+    <button class="btn" type="button" id="pre-practice">例: 練習用の短い配列</button>
+    <button class="btn" type="button" id="pre-random">ランダムな配列</button>
+  </div>
+  <div class="ctl">
+    <label for="seq"><span>塩基配列(A・T・G・C を入力)</span><output id="seq-len" for="seq"></output></label>
+    <input id="seq" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="60" style="font:1.1rem monospace;width:100%;min-height:44px;padding:4px 10px;border-radius:8px;border:2px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:0.1em">
+    <p class="hint">A・T・G・C 以外の文字は自動で取り除かれます。最大60塩基。mRNAのAUG(開始コドン)から翻訳が始まります。</p>
+  </div>
+  <div class="btn-row" role="group" aria-label="塩基を追加">
+    <button class="btn" type="button" data-add="A">A を追加</button><button class="btn" type="button" data-add="T">T を追加</button><button class="btn" type="button" data-add="G">G を追加</button><button class="btn" type="button" data-add="C">C を追加</button>
+    <button class="btn" type="button" id="seq-bs">← 1文字消す</button><button class="btn" type="button" id="seq-clear">クリア</button>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="flow-h">
+  <h2 id="flow-h">② 転写と翻訳をたどる</h2>
+  <p id="flow-msg" aria-live="polite"></p>
+  <div class="strip-wrap" tabindex="0" role="region" aria-label="転写と翻訳の図(横にスクロールできます)">
+    <div id="strip" class="strip"></div>
+  </div>
+  <p class="hint" style="margin:6px 0 0;color:var(--muted)">DNAの鋳型鎖の塩基をタップすると、その位置を選べます。表は横にスクロールできます。</p>
+  <div class="legend-row">
+    <span>転写: 鋳型鎖の A→U、T→A、G→C、C→G でmRNAができる</span>
+    <span>翻訳: mRNAの3塩基(コドン)が1つのアミノ酸を指定する</span>
+  </div>
+  <p class="note info">mRNAの塩基配列は、鋳型にならなかったほうのDNA鎖(相補鎖)の配列の T を U に変えたものと同じです。</p>
+</section>
+
+<section class="panel" aria-labelledby="mut-h">
+  <h2 id="mut-h">③ 突然変異を起こしてみる</h2>
+  <p id="sel-msg">鋳型鎖の塩基をタップして、変えたい位置を選んでください。</p>
+  <div class="btn-row" role="group" aria-label="置換する塩基"><span class="lbl" style="align-self:center;font-weight:700">置換:</span>
+    <button class="btn" type="button" data-sub="A">A に置換</button><button class="btn" type="button" data-sub="T">T に置換</button><button class="btn" type="button" data-sub="G">G に置換</button><button class="btn" type="button" data-sub="C">C に置換</button>
+  </div>
+  <div class="btn-row" role="group" aria-label="挿入と欠失"><span class="lbl" style="align-self:center;font-weight:700">挿入・欠失:</span>
+    <button class="btn" type="button" data-ins="A">A を挿入</button><button class="btn" type="button" data-ins="T">T を挿入</button><button class="btn" type="button" data-ins="G">G を挿入</button><button class="btn" type="button" data-ins="C">C を挿入</button>
+    <button class="btn" type="button" id="m-del">この塩基を欠失</button>
+  </div>
+  <div class="btn-row"><button class="btn" type="button" id="m-sickle">鎌状赤血球貧血の変異を入れる</button><button class="btn btn-primary" type="button" id="m-reset">元に戻す</button></div>
+  <h3>変異の前と後のアミノ酸の並び(タンパク質)</h3>
+  <div id="cmp"></div>
+  <p id="cmp-note" aria-live="polite" style="font-weight:700"></p>
+</section>
+
+<section class="panel" aria-labelledby="ch-h">
+  <h2 id="ch-h">④ 塩基の割合の練習(シャルガフの規則)</h2>
+  <p>二本鎖DNAでは、<b>A と T の割合が等しく、G と C の割合が等しく</b>なります(A=T、G=C)。4つの塩基の割合の合計は100%です。</p>
+  <div class="panel" style="background:var(--surface-2);margin:8px 0">
+    <p id="ch-q" style="font-weight:700;font-size:1.05rem"></p>
+    <div class="btn-row" id="ch-opts"></div>
+    <p id="ch-fb" aria-live="polite"></p>
+    <div class="btn-row"><button class="btn btn-primary" type="button" id="ch-next">次の問題</button><span style="align-self:center">正解数: <b id="ch-score">0 / 0</b></span></div>
+  </div>
+  <p class="note info">RNA(一本鎖)では、A=U のような関係は一般には成り立ちません。この規則が成り立つのは、塩基が対になる二本鎖DNAです。</p>
+</section>
+
+<section class="panel">
+  <h2>遺伝暗号表(参考)</h2>
+  <div class="scroll-x"><table class="tbl" id="codon-table" aria-label="mRNAの遺伝暗号表"></table></div>
+  <p class="note">この教材の配列は学習用の例です。ヘモグロビンの例は、ヒトβグロビン遺伝子の冒頭付近の配列を模して簡略化したもので、実際の遺伝子の全体や、その調節のしくみ(イントロンの除去など)は含みません。また、実際のDNAの鎖には向き(5′末端・3′末端)がありますが、この教材では省略しています。</p>
+</section>
+
+<section class="panel quiz" aria-labelledby="quiz-h"><h2 id="quiz-h">確認クイズ(4択)</h2><div id="quiz"></div></section>
+<p class="lead" style="font-size:0.85rem">このページは個人情報を扱わず、入力内容の保存やサーバ通信を行いません。(自動生成ファイル: 編集は <code>_src/</code> 側で行い <code>node build.mjs</code> で再生成)</p>
+</main>
+<script>
+/* 共通JS: 乱数・クイズ・テーマ切替(ビルド時に各HTMLへインライン展開される) */
+const BioCommon = (function () {
+  'use strict';
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  function shuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /** 選択肢をシャッフルし、正解位置を付け替えた問題を返す */
+  function prepareQuestion(q, rng) {
+    const order = shuffle(q.choices.map((_, i) => i), rng);
+    return {
+      q: q.q,
+      choices: order.map((i) => q.choices[i]),
+      answer: order.indexOf(q.answer),
+      explain: q.explain,
+    };
+  }
+
+  /** クイズデータの検証(エラー文字列の配列を返す。空なら正常) */
+  function validateQuiz(quiz) {
+    const errs = [];
+    if (!Array.isArray(quiz) || quiz.length < 1) return ['quiz is empty'];
+    quiz.forEach((q, n) => {
+      const p = 'Q' + (n + 1) + ': ';
+      if (!q.q || typeof q.q !== 'string') errs.push(p + 'no question text');
+      if (!Array.isArray(q.choices) || q.choices.length !== 4) errs.push(p + 'needs exactly 4 choices');
+      else if (new Set(q.choices).size !== 4) errs.push(p + 'choices must be unique');
+      if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 3) errs.push(p + 'answer index out of range');
+      if (!q.explain || q.explain.length < 10) errs.push(p + 'explanation missing');
+    });
+    return errs;
+  }
+
+  /* ---------- ブラウザ専用 ---------- */
+  const LABELS = ['ア', 'イ', 'ウ', 'エ'];
+
+  function el(tag, attrs, children) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) {
+      if (k === 'class') e.className = attrs[k];
+      else if (k === 'text') e.textContent = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach((c) => e.appendChild(c));
+    return e;
+  }
+
+  function mountQuiz(root, quizData, opts) {
+    const errs = validateQuiz(quizData);
+    if (errs.length) { root.textContent = 'クイズデータにエラー: ' + errs.join(' / '); return; }
+    const rng = (opts && opts.rng) || Math.random;
+    let qs, idx, score, missed, answered;
+
+    function start() {
+      qs = quizData.map((q) => prepareQuestion(q, rng));
+      idx = 0; score = 0; missed = []; answered = false;
+      render();
+    }
+
+    function render() {
+      root.textContent = '';
+      if (idx >= qs.length) return renderResult();
+      const q = qs[idx];
+      const head = el('div', { class: 'q-head' }, [
+        el('span', { text: '第' + (idx + 1) + '問 / 全' + qs.length + '問' }),
+        el('span', { text: '正解 ' + score + '問' }),
+      ]);
+      const text = el('div', { class: 'q-text', id: 'qtext-' + idx, text: q.q });
+      const list = el('div', { class: 'choices', role: 'group', 'aria-labelledby': 'qtext-' + idx });
+      q.choices.forEach((c, i) => {
+        const b = el('button', { type: 'button', class: 'choice', 'data-i': String(i) }, [
+          el('span', { class: 'mark', text: LABELS[i] }),
+          el('span', { text: c }),
+        ]);
+        b.addEventListener('click', () => choose(i, list, b));
+        list.appendChild(b);
+      });
+      const fb = el('div', { 'aria-live': 'polite' });
+      root.append(head, text, list, fb);
+      answered = false;
+    }
+
+    function choose(i, list, btn) {
+      if (answered) return;
+      answered = true;
+      const q = qs[idx];
+      const ok = i === q.answer;
+      if (ok) score++; else missed.push({ q: q.q, correct: q.choices[q.answer] });
+      [...list.children].forEach((b, n) => {
+        b.disabled = true;
+        const mark = b.querySelector('.mark');
+        if (n === q.answer) { b.classList.add('correct'); mark.textContent = '○'; }
+        else if (n === i) { b.classList.add('wrong'); mark.textContent = '×'; }
+      });
+      const fb = root.querySelector('[aria-live]');
+      fb.textContent = '';
+      const box = el('div', { class: 'feedback ' + (ok ? 'ok' : 'ng') }, [
+        el('div', { class: 'verdict', text: ok ? '○ 正解です' : '× 不正解 — 正解は「' + LABELS[q.answer] + '」です' }),
+        el('div', { text: q.explain }),
+      ]);
+      const next = el('button', { type: 'button', class: 'btn btn-primary', text: idx + 1 >= qs.length ? '結果を見る' : '次の問題へ' });
+      next.addEventListener('click', () => { idx++; render(); const f = root.querySelector('.q-text,.result-score'); if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); } });
+      box.appendChild(el('div', { class: 'btn-row' }, [next]));
+      fb.appendChild(box);
+    }
+
+    function renderResult() {
+      const pct = Math.round((score / qs.length) * 100);
+      root.append(el('div', { class: 'result-score', text: qs.length + '問中 ' + score + '問 正解(' + pct + '%)' }));
+      if (missed.length === 0) {
+        root.append(el('p', { text: '全問正解です。お見事!' }));
+      } else {
+        root.append(el('p', { text: 'まちがえた問題を見直しましょう。' }));
+        const ul = el('ul', { class: 'miss' });
+        missed.forEach((m) => ul.appendChild(el('li', { text: m.q + ' → 正解: ' + m.correct })));
+        root.append(ul);
+      }
+      const again = el('button', { type: 'button', class: 'btn btn-primary', text: 'もう一度挑戦する' });
+      again.addEventListener('click', start);
+      root.append(el('div', { class: 'btn-row' }, [again]));
+    }
+    start();
+  }
+
+  /* テーマ切替(保存はしない。ページを開き直すとOS設定に戻る) */
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    function effective() {
+      const t = document.documentElement.getAttribute('data-theme');
+      return t || (mq.matches ? 'dark' : 'light');
+    }
+    function label() { btn.textContent = effective() === 'dark' ? '☀ ライト表示にする' : '☾ ダーク表示にする'; }
+    btn.addEventListener('click', () => {
+      document.documentElement.setAttribute('data-theme', effective() === 'dark' ? 'light' : 'dark');
+      label();
+      document.dispatchEvent(new Event('themechange'));
+    });
+    if (mq.addEventListener) mq.addEventListener('change', () => { label(); document.dispatchEvent(new Event('themechange')); });
+    label();
+  }
+
+  /** CSS変数の現在値を取得(canvas描画用) */
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** prefers-reduced-motion */
+  function reducedMotion() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  const api = { mulberry32, clamp, lerp, ease, shuffle, prepareQuestion, validateQuiz, mountQuiz, initTheme, cssVar, reducedMotion };
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', initTheme);
+  return api;
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = BioCommon;
+
+/* DNA→mRNA→タンパク質: 純粋ロジック(Nodeでテスト可能)
+   方向性(5'/3')は高校生物基礎の範囲外のため扱わない。入力はDNAの「鋳型鎖」(転写でmRNAの鋳型になる鎖)。 */
+const DnaLogic = (function () {
+  'use strict';
+  const BASES = ['A', 'T', 'G', 'C'];
+  const DNA_COMP = { A: 'T', T: 'A', G: 'C', C: 'G' };
+  const TO_MRNA = { A: 'U', T: 'A', G: 'C', C: 'G' };      // 鋳型鎖 → mRNA
+  const MRNA_TO_NONTEMPLATE = { U: 'T', A: 'A', G: 'G', C: 'C' };
+
+  // 標準遺伝暗号表(U,C,A,G の順に 第1・第2・第3塩基)。* は終止コドン
+  const CODE = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+  const ORDER = 'UCAG';
+  const AA = {
+    F: ['Phe', 'フェニルアラニン'], L: ['Leu', 'ロイシン'], S: ['Ser', 'セリン'], Y: ['Tyr', 'チロシン'], C: ['Cys', 'システイン'],
+    W: ['Trp', 'トリプトファン'], P: ['Pro', 'プロリン'], H: ['His', 'ヒスチジン'], Q: ['Gln', 'グルタミン'], R: ['Arg', 'アルギニン'],
+    I: ['Ile', 'イソロイシン'], M: ['Met', 'メチオニン'], T: ['Thr', 'トレオニン'], N: ['Asn', 'アスパラギン'], K: ['Lys', 'リシン'],
+    V: ['Val', 'バリン'], A: ['Ala', 'アラニン'], D: ['Asp', 'アスパラギン酸'], E: ['Glu', 'グルタミン酸'], G: ['Gly', 'グリシン'],
+    '*': ['終止', '終止コドン'],
+  };
+
+  const clean = (s) => (s || '').toUpperCase().replace(/[^ATGC]/g, '');
+  function complement(dna) { return dna.split('').map((b) => DNA_COMP[b]).join(''); }
+  /** 鋳型鎖 → mRNA */
+  function transcribe(template) { return template.split('').map((b) => TO_MRNA[b]).join(''); }
+  /** コドン(RNA3文字)→ 1文字アミノ酸('*'=終止) */
+  function codonToAA(c) {
+    if (c.length !== 3) return null;
+    const i = ORDER.indexOf(c[0]), j = ORDER.indexOf(c[1]), k = ORDER.indexOf(c[2]);
+    if (i < 0 || j < 0 || k < 0) return null;
+    return CODE[i * 16 + j * 4 + k];
+  }
+  function codons(mrna) { const o = []; for (let i = 0; i + 3 <= mrna.length; i += 3) o.push(mrna.slice(i, i + 3)); return o; }
+  /** 翻訳: 最初のAUGから終止コドンまで。返り値 {start, codons[], aas[](1文字), stop(true/false), leftover} */
+  function translate(mrna) {
+    const start = mrna.indexOf('AUG');
+    if (start < 0) return { start: -1, codons: [], aas: [], stop: false, leftover: mrna.length };
+    const cs = [], aas = [];
+    let stop = false, i = start;
+    for (; i + 3 <= mrna.length; i += 3) {
+      const c = mrna.slice(i, i + 3), a = codonToAA(c);
+      cs.push(c); aas.push(a);
+      if (a === '*') { stop = true; i += 3; break; }
+    }
+    return { start, codons: cs, aas, stop, leftover: mrna.length - i };
+  }
+  const protein = (t) => t.aas.filter((a) => a !== '*').join('');
+
+  /** 鋳型鎖に変異を加える */
+  function substitute(t, pos, base) { return t.slice(0, pos) + base + t.slice(pos + 1); }
+  function insert(t, pos, base) { return t.slice(0, pos) + base + t.slice(pos); }
+  function remove(t, pos) { return t.slice(0, pos) + t.slice(pos + 1); }
+
+  /** 変異の種類を判定(変異前後のタンパク質を比較)。kind: 'sub'(置換) / 'ins'(挿入) / 'del'(欠失)
+      返り値: silent(同義) / missense(アミノ酸が変わる) / nonsense(途中で終止) / stoploss(終止コドンが失われた) / other(開始位置が変わるなど)
+              none(挿入・欠失でも変化なし) / inframe(3の倍数の挿入・欠失) / frameshift(読み枠のずれ) */
+  function classify(before, after, kind) {
+    const a = translate(transcribe(before)), b = translate(transcribe(after));
+    const pa = protein(a), pb = protein(b);
+    if (kind === 'sub') {
+      if (pa === pb && a.stop === b.stop) return 'silent';
+      if (b.stop && (!a.stop || pb.length < pa.length)) return 'nonsense';
+      if (a.stop && !b.stop && pb.startsWith(pa)) return 'stoploss';
+      if (a.start === b.start && pa.length === pb.length && a.stop === b.stop) return 'missense';
+      return 'other';
+    }
+    if (pa === pb && a.stop === b.stop) return 'none';
+    return (after.length - before.length) % 3 === 0 ? 'inframe' : 'frameshift';
+  }
+  /** 鎌状赤血球貧血の例(ヒトβグロビン遺伝子の冒頭の一部を模した配列)。
+      mRNAのコドン7(開始Metを数えない成熟タンパク質では6番目。GAG: グルタミン酸)→ GUG(バリン): 鋳型鎖の19番目(0始まり)の T→A */
+  const SICKLE = { template: 'TACCACGTGGACTGAGGACTCCTCTTCATT', mutPos: 19, mutBase: 'A' };
+
+  /* ---- シャルガフの規則 ---- */
+  /** 二本鎖DNAで、ある塩基の割合(%)から他の塩基の割合を求める */
+  function chargaff(base, pct) {
+    if (pct <= 0 || pct >= 100) return null;
+    const isAT = base === 'A' || base === 'T';
+    if (isAT) { const at = pct, gc = (100 - 2 * pct) / 2; if (gc <= 0) return null; return { A: at, T: at, G: gc, C: gc }; }
+    const gc = pct, at = (100 - 2 * pct) / 2; if (at <= 0) return null;
+    return { A: at, T: at, G: gc, C: gc };
+  }
+  /** 問題生成: 与えられた塩基と、求める塩基(別のグループ or 相補) */
+  function chargaffQuestion(rng) {
+    const given = BASES[Math.floor(rng() * 4)];
+    const pct = 15 + Math.floor(rng() * 21); // 15〜35%
+    const comp = chargaff(given, pct);
+    const askPool = BASES.filter((b) => b !== given);
+    const ask = askPool[Math.floor(rng() * askPool.length)];
+    return { given, pct, ask, answer: comp[ask] };
+  }
+  return { BASES, CODE, ORDER, AA, clean, complement, transcribe, codonToAA, codons, translate, protein, substitute, insert, remove, classify, SICKLE, chargaff, chargaffQuestion, MRNA_TO_NONTEMPLATE };
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = DnaLogic;
+
+const QUIZ = [
+  { q: 'DNAを構成する基本単位(ヌクレオチド)は、何が結合したものですか。', choices: ['アミノ酸・糖・リン酸', '塩基・糖(デオキシリボース)・リン酸', '塩基・アミノ酸・脂肪酸', '糖・脂質・リン酸'], answer: 1,
+    explain: 'ヌクレオチドは、リン酸・糖(DNAではデオキシリボース)・塩基が結合したものです。' },
+  { q: 'DNAの二重らせん構造で、塩基が対になる組み合わせとして正しいものはどれですか。', choices: ['AとG、TとC', 'AとT、GとC', 'AとC、GとT', 'AとU、GとC'], answer: 1,
+    explain: 'DNAでは、アデニン(A)とチミン(T)、グアニン(G)とシトシン(C)が対になります(相補的塩基対)。UはRNAにある塩基です。' },
+  { q: 'あるDNA(二本鎖)で、塩基Gの割合が21%でした。このDNAに含まれるAの割合は何%ですか。', choices: ['21%', '29%', '42%', '58%'], answer: 1,
+    explain: 'G = C = 21% なので G+C = 42%。残りの 58% が A+T で、A = T = 29% です(シャルガフの規則)。' },
+  { q: 'DNAの鋳型鎖の塩基配列が TAC のとき、転写されてできるmRNAのコドンはどれですか。', choices: ['ATG', 'AUG', 'UAC', 'TAC'], answer: 1,
+    explain: 'A→U、T→A、G→C、C→G と対応させます。TAC は AUG(開始コドン)になります。RNAにはTではなくUが使われます。' },
+  { q: 'DNAの情報をもとにmRNAがつくられる過程と、mRNAの情報をもとにタンパク質がつくられる過程を、それぞれ何といいますか。', choices: ['転写、翻訳', '翻訳、転写', '複製、転写', '転写、複製'], answer: 0,
+    explain: 'DNA→mRNAが転写(真核生物では核内)、mRNA→タンパク質が翻訳(細胞質のリボソーム)です。' },
+  { q: 'mRNAの塩基3つの並び(コドン)は、何を指定していますか。', choices: ['1つのアミノ酸', '1つのタンパク質', '1つの遺伝子', '1つのヌクレオチド'], answer: 0,
+    explain: 'mRNAの連続する3塩基(コドン)が1つのアミノ酸を指定します(終止コドンは翻訳の終わりを指定)。' },
+  { q: 'コドンの種類は64通りありますが、タンパク質をつくるアミノ酸は20種類です。このことから言えることはどれですか。', choices: ['アミノ酸を指定しないコドンが44通りある', '複数のコドンが同じアミノ酸を指定する場合がある', '1つのコドンが複数のアミノ酸を指定する', '1つのアミノ酸は必ず1つのコドンで指定される'], answer: 1,
+    explain: '61通りのコドンが20種類のアミノ酸を指定し(終止コドン3通りは別)、同じアミノ酸を指定するコドンが複数あります。そのため塩基が1つ置換してもアミノ酸が変わらない場合があります。' },
+  { q: 'DNAの塩基が1つ別の塩基に置き換わったのに、できるタンパク質のアミノ酸配列が変わらないことがあるのはなぜですか。', choices: ['塩基の置換はタンパク質に影響しないから', '複数のコドンが同じアミノ酸を指定することがあるから', 'mRNAが使われないから', 'リボソームが修復するから'], answer: 1,
+    explain: '遺伝暗号は重複しており、例えばGAA・GAGはどちらもグルタミン酸を指定します。置換後のコドンが同じアミノ酸を指定すれば、タンパク質は変わりません。' },
+  { q: '鎌状赤血球貧血は、βグロビン遺伝子の1塩基の置換により、ヘモグロビンのアミノ酸が1つ変わって起こります。この変化の種類として最も適切なものはどれですか。', choices: ['塩基の挿入により読み枠がずれた', '置換により、別のアミノ酸を指定するコドンになった', '置換により、終止コドンができた', '遺伝子全体が失われた'], answer: 1,
+    explain: 'GAG(グルタミン酸)がGUG(バリン)に変わる1塩基の置換で、アミノ酸が1つ変わります。これによりヘモグロビンの性質が変わり、赤血球が鎌状になります。' },
+  { q: '遺伝子の途中で塩基が1つ失われると(欠失)、それ以降のアミノ酸配列が大きく変わることが多いのはなぜですか。', choices: ['DNAが短くなるから', 'コドンの区切り(読み枠)がずれるから', 'mRNAがつくられなくなるから', 'アミノ酸が増えるから'], answer: 1,
+    explain: '3塩基ずつ読むため、1塩基の欠失・挿入があると、それ以降のコドンの区切りがすべてずれてしまいます(フレームシフト)。' },
+];
+
+(function () {
+  'use strict';
+  const L = DnaLogic, C = BioCommon;
+  const $ = (id) => document.getElementById(id);
+  const rng = Math.random;
+  const MAXLEN = 60;
+  let base = L.SICKLE.template, cur = base, ops = 0, lastKind = null, sel = -1, focusIdx = null;
+
+  const aaName = (a) => (a === '*' ? '終止' : L.AA[a][0]);
+  const aaJa = (a) => (a === '*' ? '終止コドン' : L.AA[a][1]);
+
+  function blockList(t, tpl) {
+    // 表示用のブロック(3塩基ずつ)。翻訳される範囲(コドン)と、翻訳されない前後に分ける
+    const blocks = [];
+    const n = tpl.length;
+    const start = t.start < 0 ? n : t.start;
+    for (let i = 0; i < start; i += 3) blocks.push({ s: i, len: Math.min(3, start - i), kind: 'pre' });
+    let i = start;
+    t.codons.forEach((c, k) => { blocks.push({ s: i, len: 3, kind: 'codon', aa: t.aas[k], first: k === 0 }); i += 3; });
+    for (; i < n; i += 3) blocks.push({ s: i, len: Math.min(3, n - i), kind: 'post', partial: n - i < 3 });
+    return blocks;
+  }
+
+  function baseCell(ch, cls, extra) { return `<span class="b ${cls || ch}${extra || ''}" aria-hidden="true">${ch}</span>`; }
+
+  function renderStrip() {
+    const mrna = L.transcribe(cur), t = L.translate(mrna);
+    const blocks = blockList(t, cur);
+    const diffMark = (cur.length === base.length) ? cur.split('').map((c, i) => c !== base[i]) : cur.split('').map(() => false);
+    let h = `<div class="lab"><div>DNA<br>(鋳型鎖)</div><div>DNA<br>(相補鎖)</div><div>mRNA</div><div>アミノ酸</div></div>`;
+    blocks.forEach((b) => {
+      const seg = cur.slice(b.s, b.s + b.len);
+      const comp = L.complement(seg), m = L.transcribe(seg);
+      let r1 = '', r2 = '', r3 = '';
+      for (let k = 0; k < seg.length; k++) {
+        const idx = b.s + k;
+        r1 += `<button type="button" class="b ${seg[k]}${diffMark[idx] ? ' mut' : ''}" data-idx="${idx}" aria-pressed="${sel === idx}" aria-label="鋳型鎖の${idx + 1}番目の塩基 ${seg[k]}">${seg[k]}</button>`;
+        r2 += baseCell(comp[k], comp[k]);
+        r3 += baseCell(m[k], m[k]);
+      }
+      let aa;
+      if (b.kind === 'codon') {
+        const stop = b.aa === '*';
+        aa = `<div class="aa ${stop ? 'stop' : (b.first ? 'start' : '')}"><b>${aaName(b.aa)}</b><small>${stop ? '翻訳の終わり' : aaJa(b.aa)}${b.first ? '(開始)' : ''}</small></div>`;
+      } else {
+        aa = `<div class="aa"><small>${b.partial ? '3塩基に満たない' : '翻訳されない'}</small></div>`;
+      }
+      h += `<div class="blk ${b.kind === 'codon' ? '' : 'pre'}"><div class="row3">${r1}</div><div class="row3">${r2}</div><div class="row3">${r3}</div>${aa}</div>`;
+    });
+    $('strip').innerHTML = h;
+    if (focusIdx != null) { const el = $('strip').querySelector(`button[data-idx="${focusIdx}"]`); if (el) el.focus({ preventScroll: true }); focusIdx = null; }
+    $('strip').querySelectorAll('button.b').forEach((bt) => bt.addEventListener('click', () => { sel = Number(bt.dataset.idx); focusIdx = sel; renderAll(); }));
+    let msg;
+    if (!cur.length) msg = '配列が空です。塩基を入力するか、例のボタンを押してください。';
+    else if (t.start < 0) msg = 'mRNAに開始コドン AUG が見つからないため、翻訳は始まりません。(鋳型鎖に TAC を含む配列にしてみましょう)';
+    else msg = `mRNA: ${mrna}。AUG から翻訳が始まり、${t.stop ? '終止コドンで終わります' : '終止コドンが見つからないまま配列の終わりになりました'}。できるアミノ酸の並び: ${L.protein(t).split('').map(aaName).join('-') || '(なし)'}`;
+    $('flow-msg').textContent = msg;
+  }
+
+  function chipsFor(tr, other) {
+    const n = Math.max(tr.aas.length, other ? other.aas.length : 0);
+    let h = '';
+    for (let i = 0; i < tr.aas.length; i++) {
+      const a = tr.aas[i], o = other ? other.aas[i] : a;
+      h += `<span class="chip${a !== o ? ' diff' : ''}${a === '*' ? ' stop' : ''}">${aaName(a)}${a !== o ? ' ▲' : ''}</span>`;
+      if (i < tr.aas.length - 1) h += '<span aria-hidden="true">–</span>';
+    }
+    if (!tr.aas.length) h = '<span style="color:var(--muted)">(アミノ酸なし)</span>';
+    void n;
+    return h;
+  }
+  const MSG = {
+    silent: '塩基は変わりましたが、アミノ酸の並びは変わりませんでした。複数のコドンが同じアミノ酸を指定している場合(同義置換)や、変異が翻訳される範囲の外にある場合に起こります。',
+    stoploss: '終止コドンが別のコドンに変わったため、翻訳が終わらず、タンパク質が長くなりました。',
+    missense: 'ミスセンス変異: アミノ酸が1つ別のアミノ酸に変わりました。',
+    nonsense: 'ナンセンス変異: 途中に終止コドンができて、タンパク質が短くなりました。',
+    frameshift: 'フレームシフト: 3の倍数ではない塩基の挿入・欠失により、コドンの区切り(読み枠)がずれ、そこから後ろのアミノ酸が大きく変わりました。',
+    inframe: '3の倍数の塩基の挿入・欠失: 読み枠は保たれ、アミノ酸が増えたり減ったり、変わったりしました。',
+    none: '挿入・欠失がありましたが、できるアミノ酸の並びは変わりませんでした(翻訳される範囲の外など)。',
+    other: '翻訳が始まる位置などが変わり、タンパク質が大きく変わりました。',
+  };
+  function renderCompare() {
+    const tb = L.translate(L.transcribe(base)), tc = L.translate(L.transcribe(cur));
+    if (cur === base) {
+      $('cmp').innerHTML = `<div><b>現在のタンパク質:</b></div><div class="chips">${chipsFor(tb)}</div>`;
+      $('cmp-note').textContent = 'まだ変異を入れていません。塩基をタップして選び、置換・挿入・欠失を試してみましょう。';
+      return;
+    }
+    $('cmp').innerHTML = `<div><b>変異前:</b></div><div class="chips">${chipsFor(tb, tc)}</div><div><b>変異後:</b></div><div class="chips">${chipsFor(tc, tb)}</div>`;
+    if (ops === 1 && lastKind) {
+      const k = L.classify(base, cur, lastKind);
+      let m = MSG[k] || '';
+      if (cur === L.substitute(L.SICKLE.template, L.SICKLE.mutPos, L.SICKLE.mutBase) && base === L.SICKLE.template) m += ' これは鎌状赤血球貧血の原因になる変異の例です(ヘモグロビンのアミノ酸1つの変化で、赤血球が鎌状に変形しやすくなる)。';
+      $('cmp-note').textContent = m;
+    } else {
+      $('cmp-note').textContent = '変異が複数入っています。「元に戻す」で、1つずつ影響を調べてみましょう。(▲=変異前と違うアミノ酸)';
+    }
+  }
+
+  function renderControls() {
+    const has = sel >= 0 && sel < cur.length;
+    document.querySelectorAll('[data-sub]').forEach((b) => { b.disabled = !has || cur[sel] === b.dataset.sub; });
+    document.querySelectorAll('[data-ins]').forEach((b) => { b.disabled = !has || cur.length >= MAXLEN; });
+    $('m-del').disabled = !has;
+    $('m-reset').disabled = cur === base && ops === 0;
+    $('sel-msg').textContent = has ? `選択中: 鋳型鎖の${sel + 1}番目の塩基 ${cur[sel]}。置換・挿入(この塩基の前に入れる)・欠失ができます。` : '鋳型鎖の塩基をタップして、変えたい位置を選んでください。';
+    $('seq').value = cur;
+    $('seq-len').textContent = cur.length + ' 塩基';
+  }
+  function renderAll() { renderStrip(); renderCompare(); renderControls(); }
+
+  function setBase(s) { base = cur = s; ops = 0; lastKind = null; sel = -1; renderAll(); }
+
+  /* 入力 */
+  $('seq').addEventListener('input', () => { const v = L.clean($('seq').value).slice(0, MAXLEN); setBase(v); });
+  document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => { if (cur.length < MAXLEN) setBase(cur + b.dataset.add); }));
+  $('seq-bs').addEventListener('click', () => setBase(cur.slice(0, -1)));
+  $('seq-clear').addEventListener('click', () => setBase(''));
+  $('pre-sickle').addEventListener('click', () => setBase(L.SICKLE.template));
+  $('pre-practice').addEventListener('click', () => setBase('TACAAAGGGTTTCCCACT'));
+  $('pre-random').addEventListener('click', () => {
+    const pick = () => L.BASES[Math.floor(rng() * 4)];
+    let s = 'TAC';
+    const n = 5 + Math.floor(rng() * 4);
+    for (let i = 0; i < n; i++) { let c; do { c = pick() + pick() + pick(); } while (L.codonToAA(L.transcribe(c)) === '*'); s += c; }
+    setBase(s + ['ATT', 'ATC', 'ACT'][Math.floor(rng() * 3)]);
+  });
+
+  /* 変異 */
+  function mutate(kind, newSeq, newSel) { cur = newSeq; ops++; lastKind = kind; sel = newSel; focusIdx = newSel >= 0 ? newSel : null; renderAll(); }
+  document.querySelectorAll('[data-sub]').forEach((b) => b.addEventListener('click', () => { if (sel >= 0) mutate('sub', L.substitute(cur, sel, b.dataset.sub), sel); }));
+  document.querySelectorAll('[data-ins]').forEach((b) => b.addEventListener('click', () => { if (sel >= 0 && cur.length < MAXLEN) mutate('ins', L.insert(cur, sel, b.dataset.ins), sel + 1); }));
+  $('m-del').addEventListener('click', () => { if (sel >= 0) { const n = L.remove(cur, sel); mutate('del', n, Math.min(sel, n.length - 1)); } });
+  $('m-reset').addEventListener('click', () => { cur = base; ops = 0; lastKind = null; renderAll(); });
+  $('m-sickle').addEventListener('click', () => {
+    base = L.SICKLE.template; cur = L.substitute(base, L.SICKLE.mutPos, L.SICKLE.mutBase); ops = 1; lastKind = 'sub'; sel = L.SICKLE.mutPos; renderAll();
+    $('flow-msg').scrollIntoView && 0;
+  });
+
+  /* シャルガフの規則 */
+  let q = null, score = [0, 0], answered = false;
+  function newQ() {
+    q = L.chargaffQuestion(rng); answered = false;
+    const pool = [q.pct, 100 - q.pct, 100 - 2 * q.pct, 2 * q.pct, 50 - q.pct, 50].filter((v, i, a) => v > 0 && v < 100 && v !== q.answer && a.indexOf(v) === i);
+    const opts = C.shuffle([q.answer].concat(C.shuffle(pool, rng).slice(0, 3)), rng);
+    q.opts = opts;
+    $('ch-q').textContent = `ある生物の二本鎖DNAで、${q.given} の割合が ${q.pct}% でした。${q.ask} の割合は何%でしょう。`;
+    $('ch-opts').innerHTML = opts.map((v) => `<button type="button" class="btn" data-v="${v}">${v}%</button>`).join('');
+    $('ch-opts').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+      if (answered) return; answered = true; score[1]++;
+      const ok = Number(b.dataset.v) === q.answer; if (ok) score[0]++;
+      const comp = L.chargaff(q.given, q.pct);
+      $('ch-fb').textContent = (ok ? '○ 正解! ' : '× 不正解。 ') + `A=T=${comp.A}%、G=C=${comp.G}% なので、${q.ask} は ${q.answer}% です。(A+T+G+C=100%)`;
+      $('ch-score').textContent = score[0] + ' / ' + score[1];
+      $('ch-opts').querySelectorAll('button').forEach((x) => { x.disabled = true; if (Number(x.dataset.v) === q.answer) x.textContent = '○ ' + x.textContent; else if (x === b) x.textContent = '× ' + x.textContent; });
+    }));
+    $('ch-fb').textContent = '';
+  }
+  $('ch-next').addEventListener('click', newQ);
+
+  /* 暗号表 */
+  (function () {
+    let h = '<tr><th rowspan="2">1番目</th><th colspan="4">2番目の塩基</th><th rowspan="2">3番目</th></tr><tr>' + 'UCAG'.split('').map((x) => `<th>${x}</th>`).join('') + '</tr>';
+    'UCAG'.split('').forEach((a) => {
+      for (let k = 0; k < 4; k++) {
+        h += '<tr>' + (k === 0 ? `<th rowspan="4">${a}</th>` : '');
+        'UCAG'.split('').forEach((b) => { const c = a + b + 'UCAG'[k], x = L.codonToAA(c); h += `<td class="${x === '*' ? 'stopc' : ''}">${c} ${x === '*' ? '終止' : L.AA[x][0]}</td>`; });
+        h += `<th>${'UCAG'[k]}</th></tr>`;
+      }
+    });
+    $('codon-table').innerHTML = h;
+  })();
+
+  document.addEventListener('themechange', () => {});
+  renderAll(); newQ();
+  C.mountQuiz($('quiz'), QUIZ);
+  window.__dna = { get cur() { return cur; }, get base() { return base; }, get sel() { return sel; }, get ops() { return ops; } };
+})();
+
+</script>
+</body>
+</html>
